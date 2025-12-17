@@ -69,7 +69,8 @@ pkill -f "esbuild"
 ```bash
 npm run dev -- --port 5179
 ```
-
+win 端口查询方法
+netstat -ano | findstr :8080
 
 ## 项目说明
 

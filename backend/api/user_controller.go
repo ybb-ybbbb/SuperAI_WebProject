@@ -175,22 +175,22 @@ func (c *UserController) Login(ctx *gin.Context) {
 	})
 }
 
-// GetUserInfo 获取用户信息
-func (c *UserController) GetUserInfo(ctx *gin.Context) {
+// GetUsers 获取所有用户信息
+func (c *UserController) GetUsers(ctx *gin.Context) {
 	// 这里可以添加JWT认证，获取用户ID
 	// 暂时直接返回所有用户信息
 	users, err := c.userService.GetAllUsers()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, Response{
 			Code:    500,
-			Message: "获取用户信息失败: " + err.Error(),
+			Message: "获取用户列表失败: " + err.Error(),
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, Response{
 		Code:    200,
-		Message: "获取用户信息成功",
+		Message: "获取用户列表成功",
 		Data:    users,
 	})
 }

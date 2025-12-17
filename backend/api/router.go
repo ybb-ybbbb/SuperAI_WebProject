@@ -16,7 +16,7 @@ func SetupRouter() *gin.Engine {
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:5173", "http://localhost:5174"}, // 允许前端域名
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
@@ -33,7 +33,7 @@ func SetupRouter() *gin.Engine {
 		{
 			user.POST("/register", userController.Register)
 			user.POST("/login", userController.Login)
-			user.GET("/info", userController.GetUserInfo)
+			user.GET("/info", userController.GetUsers)
 			// 获取单个用户
 			user.GET("/:id", userController.GetUser)
 			// 更新用户基本信息
@@ -47,6 +47,9 @@ func SetupRouter() *gin.Engine {
 			user.GET("/:id/vip", userController.GetUserVipStatus)
 			user.GET("/:id/vip/check", userController.CheckUserVip)
 		}
+        
+        // 与前端对齐的用户列表路由
+        api.GET("/users", userController.GetUsers)
 	}
 
 	return r

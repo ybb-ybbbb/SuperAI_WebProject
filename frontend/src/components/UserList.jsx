@@ -28,7 +28,7 @@ const UserList = () => {
       }
       
       const data = await response.json();
-      setUsers(data);
+      setUsers(data.data);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -57,7 +57,7 @@ const UserList = () => {
     if (window.confirm('确定要删除这个用户吗？')) {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:8080/api/users/${id}`, {
+        const response = await fetch(`http://localhost:8080/api/user/${id}`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
@@ -77,7 +77,8 @@ const UserList = () => {
     }
   };
 
-  // 处理状态切换
+  // 处理状态切换 - 暂时注释，因为后端不支持此功能
+  /*
   const toggleStatus = async (id) => {
     try {
       const token = localStorage.getItem('token');
@@ -105,6 +106,7 @@ const UserList = () => {
       setError(err.message);
     }
   };
+  */
 
   // 处理编辑用户
   const handleEdit = (id) => {
@@ -117,9 +119,9 @@ const UserList = () => {
     return status === 'active' ? '活跃' : '禁用';
   };
 
-  // 获取角色显示文本
-  const getRoleText = (role) => {
-    return role === 'admin' ? '管理员' : '普通用户';
+  // 获取VIP状态显示文本
+  const getVipText = (isVip) => {
+    return isVip ? 'VIP用户' : '普通用户';
   };
 
   return (
@@ -174,17 +176,14 @@ const UserList = () => {
                       <td>{user.username}</td>
                       <td>{user.email}</td>
                       <td>
-                        <span className={`role-badge ${user.role === 'admin' ? 'admin' : 'user'}`}>
-                          {getRoleText(user.role)}
+                        <span className={`role-badge ${user.is_vip ? 'vip' : 'user'}`}>
+                          {getVipText(user.is_vip)}
                         </span>
                       </td>
                       <td>
-                        <button 
-                          className={`status-button ${user.status === 'active' ? 'active' : 'disabled'}`}
-                          onClick={() => toggleStatus(user.id)}
-                        >
-                          {getStatusText(user.status)}
-                        </button>
+                        <span className="user-role">
+                          {user.is_vip ? 'VIP' : '普通用户'}
+                        </span>
                       </td>
                       <td>{new Date(user.createdAt).toLocaleDateString()}</td>
                       <td className="action-buttons">
