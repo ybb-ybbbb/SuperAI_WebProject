@@ -88,7 +88,10 @@ const TopBar = () => {
               <span className="user-avatar">
                 {user?.username?.charAt(0).toUpperCase() || '👤'}
               </span>
-              <span className="user-name">{user?.username || '用户'}</span>
+              <span className="user-name">
+                {user?.username || '用户'}
+                {user?.is_vip && <span className="vip-badge-small">⭐</span>}
+              </span>
               <span className="dropdown-arrow">▼</span>
             </button>
             {showUserMenu && (

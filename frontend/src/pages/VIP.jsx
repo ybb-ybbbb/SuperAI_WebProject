@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import TopBar from '../components/TopBar';
 
 const VIP = () => {
-  const [user, _setUser] = useState(() => {
+  const [user, setUser] = useState(() => {
     try {
       const storedUser = localStorage.getItem('user');
       if (storedUser && storedUser !== 'undefined') {
@@ -15,6 +15,49 @@ const VIP = () => {
     }
     return null;
   });
+
+  // 获取最新用户信息
+  const fetchUserInfo = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:8080/api/user/info', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('获取用户信息失败');
+      }
+      
+      const data = await response.json();
+      if (data.data && Array.isArray(data.data) && data.data.length > 0) {
+        // 如果返回的是用户列表，找到当前用户
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          const currentUser = data.data.find(u => u.id === parsedUser.id);
+          if (currentUser) {
+            setUser(currentUser);
+            localStorage.setItem('user', JSON.stringify(currentUser));
+          }
+        }
+      } else if (data.data) {
+        // 如果返回的是单个用户信息
+        setUser(data.data);
+        localStorage.setItem('user', JSON.stringify(data.data));
+      }
+    } catch (error) {
+      console.error('获取用户信息失败:', error);
+    }
+  };
+
+  // 组件加载时获取最新用户信息
+  useEffect(() => {
+    fetchUserInfo();
+  }, []);
   
   const vipPlans = [
     {
@@ -97,12 +140,12 @@ const VIP = () => {
           <div className="vip-status-section">
             <div className="vip-status-card">
               <h2>您的当前状态</h2>
-              {user.isVip ? (
+              {user.is_vip ? (
                 <div className="vip-active">
                   <div className="vip-badge-large">⭐</div>
                   <h3>尊贵VIP会员</h3>
-                  {user.vipEndAt && (
-                    <p>有效期至：{new Date(user.vipEndAt).toLocaleDateString()}</p>
+                  {user.vip_end_at && (
+                    <p>有效期至：{new Date(user.vip_end_at).toLocaleDateString()}</p>
                   )}
                   <button className="renew-button">续费会员</button>
                 </div>

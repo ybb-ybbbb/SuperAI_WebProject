@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import TopBar from '../components/TopBar';
 
@@ -15,6 +15,49 @@ const Profile = () => {
     }
     return null;
   });
+
+  // 获取最新用户信息
+  const fetchUserInfo = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:8080/api/user/info', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('获取用户信息失败');
+      }
+      
+      const data = await response.json();
+      if (data.data && Array.isArray(data.data) && data.data.length > 0) {
+        // 如果返回的是用户列表，找到当前用户
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          const currentUser = data.data.find(u => u.id === parsedUser.id);
+          if (currentUser) {
+            setUser(currentUser);
+            localStorage.setItem('user', JSON.stringify(currentUser));
+          }
+        }
+      } else if (data.data) {
+        // 如果返回的是单个用户信息
+        setUser(data.data);
+        localStorage.setItem('user', JSON.stringify(data.data));
+      }
+    } catch (error) {
+      console.error('获取用户信息失败:', error);
+    }
+  };
+
+  // 组件加载时获取最新用户信息
+  useEffect(() => {
+    fetchUserInfo();
+  }, []);
   const [activeTab, setActiveTab] = useState('info');
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -168,14 +211,14 @@ const Profile = () => {
             <div className="profile-overview">
               <div className="profile-avatar">
                 <span className="avatar-icon">{user.avatar || '👤'}</span>
-                {user.isVip && (
+                {user.is_vip && (
                   <span className="vip-badge">⭐ VIP</span>
                 )}
               </div>
               <div className="profile-basic-info">
                 <h2 className="profile-name">
                   {user.username}
-                  {user.isVip && (
+                  {user.is_vip && (
                     <span className="vip-tag">⭐ VIP</span>
                   )}
                 </h2>
@@ -321,12 +364,12 @@ const Profile = () => {
                         <div className="info-row">
                           <div className="info-label">VIP状态</div>
                           <div className="info-value">
-                            {user.isVip ? (
+                            {user.is_vip ? (
                               <span className="vip-status-active">
                                 ⭐ 已开通VIP
-                                {user.vipEndAt && (
+                                {user.vip_end_at && (
                                   <span className="vip-expiry">
-                                    （有效期至：{new Date(user.vipEndAt).toLocaleDateString()}）
+                                    （有效期至：{new Date(user.vip_end_at).toLocaleDateString()}）
                                   </span>
                                 )}
                               </span>
