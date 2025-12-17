@@ -1,9 +1,17 @@
 import { useState } from 'react';
 
 const TopBar = () => {
-  const [user, setUser] = useState(() => {
-    const storedUser = localStorage.getItem('user');
-    return storedUser ? JSON.parse(storedUser) : null;
+  const [user, _setUser] = useState(() => {
+    try {
+      const storedUser = localStorage.getItem('user');
+      if (storedUser && storedUser !== 'undefined') {
+        return JSON.parse(storedUser);
+      }
+    } catch (error) {
+      console.error('解析用户数据失败:', error);
+      localStorage.removeItem('user');
+    }
+    return null;
   });
 
   const [showNotifications, setShowNotifications] = useState(false);
@@ -98,6 +106,10 @@ const TopBar = () => {
                   <button className="menu-item">
                     <span className="item-icon">👤</span>
                     <span className="item-text">个人资料</span>
+                  </button>
+                  <button className="menu-item" onClick={() => window.location.href = '/vip'}>
+                    <span className="item-icon">⭐</span>
+                    <span className="item-text">VIP会员</span>
                   </button>
                   <button className="menu-item">
                     <span className="item-icon">⚙️</span>

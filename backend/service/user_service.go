@@ -89,3 +89,24 @@ func (s *UserService) CheckUserVip(id uint) (bool, error) {
 
 	return false, nil
 }
+
+// UpdateUserInfo 更新用户基本信息
+func (s *UserService) UpdateUserInfo(id uint, username, email string) error {
+	return utils.GetDB().Model(&model.User{}).Where("id = ?", id).Updates(map[string]interface{}{
+		"username": username,
+		"email":    email,
+	}).Error
+}
+
+// UpdateUserPassword 更新用户密码
+func (s *UserService) UpdateUserPassword(id uint, password string) error {
+	// 先获取用户
+	user, err := s.GetUserByID(id)
+	if err != nil {
+		return err
+	}
+
+	// 更新密码（会触发BeforeSave钩子自动哈希）
+	user.Password = password
+	return utils.GetDB().Save(user).Error
+}

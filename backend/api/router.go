@@ -1,9 +1,10 @@
 package api
 
 import (
+	"time"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"time"
 )
 
 // SetupRouter 设置路由
@@ -33,6 +34,14 @@ func SetupRouter() *gin.Engine {
 			user.POST("/register", userController.Register)
 			user.POST("/login", userController.Login)
 			user.GET("/info", userController.GetUserInfo)
+			// 获取单个用户
+			user.GET("/:id", userController.GetUser)
+			// 更新用户基本信息
+			user.PUT("/:id", userController.UpdateUserInfo)
+			// 更新用户密码
+			user.PUT("/:id/password", userController.UpdateUserPassword)
+			// 删除用户
+			user.DELETE("/:id", userController.DeleteUser)
 			// VIP相关路由
 			user.POST("/:id/vip", userController.UpdateUserVip)
 			user.GET("/:id/vip", userController.GetUserVipStatus)
