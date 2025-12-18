@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaSmile, FaRegMeh } from 'react-icons/fa';
+import './AuthMacaron.css';
 
-const Login = () => {
+const Login = ({ onTabChange }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -30,8 +32,6 @@ const Login = () => {
       
       const data = await response.json();
       
-      // 检查后端返回的数据格式，根据实际情况调整
-      // 假设后端返回格式：{ code: 200, message: "", data: { token: "xxx", user: { ... } } }
       const token = data.data?.token || data.token;
       const user = data.data?.user || data.data;
       
@@ -39,12 +39,10 @@ const Login = () => {
         throw new Error('登录失败：缺少token或用户信息');
       }
       
-      // 保存真实的token和用户信息到localStorage
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
       setSuccess('登录成功，正在跳转...');
       
-      // 延迟跳转，让用户看到成功提示
       setTimeout(() => {
         window.location.href = '/dashboard';
       }, 1500);
@@ -56,53 +54,89 @@ const Login = () => {
   };
 
   return (
-    <div className="auth-container">
-      <h2>登录</h2>
-      {error && <div className="error-message">{error}</div>}
-      <form onSubmit={handleSubmit} className="auth-form">
-        <div className="form-group">
-          <label htmlFor="email">邮箱</label>
+    <div className="auth-container-macaron">
+      <h2 className="auth-title-macaron">欢迎回来</h2>
+      <p className="auth-subtitle-macaron">登录您的账户，继续精彩旅程</p>
+      
+      <form onSubmit={handleSubmit} className="auth-form-macaron">
+        <div className="form-group-macaron">
+          <label htmlFor="email" className="form-label-macaron">
+            <FaEnvelope className="label-icon" />
+            邮箱地址
+          </label>
           <input
             type="email"
             id="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            placeholder="请输入邮箱"
+            placeholder="your@email.com"
+            className="form-input-macaron"
           />
         </div>
-        <div className="form-group">
-          <label htmlFor="password">密码</label>
-          <div className="password-input-container">
+
+        <div className="form-group-macaron">
+          <label htmlFor="password" className="form-label-macaron">
+            <FaLock className="label-icon" />
+            密码
+          </label>
+          <div className="password-wrapper-macaron">
             <input
               type={showPassword ? 'text' : 'password'}
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              placeholder="请输入密码"
+              placeholder="••••••••"
+              className="form-input-macaron"
             />
             <button
               type="button"
-              className="password-toggle-button"
+              className="password-toggle-macaron"
               onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? '隐藏密码' : '显示密码'}
             >
-              {showPassword ? '隐藏' : '显示'}
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
             </button>
           </div>
         </div>
-        {error && <div className="error-message">{error}</div>}
-        {success && <div className="success-message">{success}</div>}
+
+        {error && (
+          <div className="message-macaron error-macaron">
+            <FaRegMeh className="message-icon" />
+            <span>{error}</span>
+          </div>
+        )}
+
+        {success && (
+          <div className="message-macaron success-macaron">
+            <FaSmile className="message-icon" />
+            <span>{success}</span>
+          </div>
+        )}
+
         <button 
           type="submit" 
-          className="auth-button"
+          className="submit-button-macaron"
           disabled={isLoading}
         >
-          {isLoading ? '登录中...' : '登录'}
+          {isLoading ? (
+            <span className="button-loading">登录中...</span>
+          ) : (
+            '登录'
+          )}
         </button>
       </form>
-      <div className="auth-switch">
-        <p>还没有账号？<a href="#register">注册</a></p>
+
+      <div className="auth-footer-macaron">
+        <p>还没有账号？ 
+          <span 
+            className="auth-link-macaron" 
+            onClick={() => onTabChange('register')}
+          >
+            立即注册
+          </span>
+        </p>
       </div>
     </div>
   );

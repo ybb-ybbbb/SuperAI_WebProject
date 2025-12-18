@@ -22,7 +22,7 @@ func main() {
 	}
 
 	// 自动迁移模型
-	if err := utils.GetDB().AutoMigrate(&model.User{}); err != nil {
+	if err := utils.GetDB().AutoMigrate(&model.User{}, &model.VipPlan{}, &model.VipRecord{}, &model.VipOrder{}); err != nil {
 		log.Fatalf("模型迁移失败: %v", err)
 	}
 
