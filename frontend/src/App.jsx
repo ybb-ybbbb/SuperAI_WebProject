@@ -8,26 +8,28 @@ function App() {
 
   return (
     <div className="app-container">
-      <header className="app-header">
-        <h1>SuperAI</h1>
-      </header>
       <main className="app-main">
-        <div className="auth-tabs">
-          <button 
-            className={`auth-tab ${activeTab === 'login' ? 'active' : ''}`}
-            onClick={() => setActiveTab('login')}
-          >
-            登录
-          </button>
-          <button 
-            className={`auth-tab ${activeTab === 'register' ? 'active' : ''}`}
-            onClick={() => setActiveTab('register')}
-          >
-            注册
-          </button>
-        </div>
-        <div className="auth-content">
-          {activeTab === 'login' ? <Login onTabChange={setActiveTab} /> : <Register onTabChange={setActiveTab} />}
+        <div className="auth-card-wrapper">
+          <div className="auth-card-header">
+            <h1 className="app-logo">SuperAI</h1>
+            <div className="auth-tabs">
+              <button 
+                className={`auth-tab ${activeTab === 'login' ? 'active' : ''}`}
+                onClick={() => setActiveTab('login')}
+              >
+                登录
+              </button>
+              <button 
+                className={`auth-tab ${activeTab === 'register' ? 'active' : ''}`}
+                onClick={() => setActiveTab('register')}
+              >
+                注册
+              </button>
+            </div>
+          </div>
+          <div className="auth-content">
+            {activeTab === 'login' ? <Login onTabChange={setActiveTab} /> : <Register onTabChange={setActiveTab} />}
+          </div>
         </div>
       </main>
     </div>

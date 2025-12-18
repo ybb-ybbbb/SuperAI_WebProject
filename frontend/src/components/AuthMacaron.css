@@ -1,0 +1,397 @@
+/* ========================================
+   Fresh Style Auth Components
+   清新愉悦风格，蓝绿色系
+   ======================================== */
+
+/* 表单容器 */
+.auth-container-macaron {
+  position: relative;
+  background: white;
+  padding: 2.5rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 标题样式 */
+.auth-title-macaron {
+  margin: 0 0 0.5rem 0;
+  color: #2C3E50;
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: -0.3px;
+}
+
+.auth-subtitle-macaron {
+  margin: 0 0 2rem 0;
+  color: #7B8794;
+  font-size: 0.9rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* 表单样式 */
+.auth-form-macaron {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* 表单组 */
+.form-group-macaron {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* 标签样式 */
+.form-label-macaron {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #6B7280;
+  margin-left: 0.25rem;
+  transition: all 0.3s ease;
+}
+
+.label-icon {
+  font-size: 0.85rem;
+  color: #9CA3AF;
+  transition: all 0.3s ease;
+}
+
+.form-group-macaron:focus-within .form-label-macaron {
+  color: #66C2D7;
+}
+
+.form-group-macaron:focus-within .label-icon {
+  color: #66C2D7;
+  transform: scale(1.1);
+}
+
+/* 输入框样式 */
+.form-input-macaron {
+  width: 100%;
+  padding: 1rem 1.2rem;
+  border: 2px solid #E5E7EB;
+  border-radius: 16px;
+  font-size: 1rem;
+  color: #374151;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.03);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
+}
+
+.form-input-macaron::placeholder {
+  color: #D1D5DB;
+  font-size: 0.95rem;
+}
+
+.form-input-macaron:focus {
+  outline: none;
+  border-color: #66C2D7;
+  background: #FFFFFF;
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.03),
+    0 0 0 4px rgba(102, 194, 215, 0.15);
+  transform: translateY(-1px);
+}
+
+/* 密码输入框容器 */
+.password-wrapper-macaron {
+  position: relative;
+  width: 100%;
+}
+
+.password-wrapper-macaron .form-input-macaron {
+  padding-right: 3.5rem;
+}
+
+/* 密码切换按钮 */
+.password-toggle-macaron {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #9CA3AF;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+}
+
+.password-toggle-macaron:hover {
+  color: #66C2D7;
+  background: rgba(102, 194, 215, 0.1);
+  transform: translateY(-50%) scale(1.1);
+}
+
+/* 字段错误提示 */
+.field-error-macaron {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #FF6B6B;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-top: 0.25rem;
+  margin-left: 0.25rem;
+  animation: shakeError 0.4s ease;
+}
+
+.error-icon-small {
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+@keyframes shakeError {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+/* 消息提示框 */
+.message-macaron {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.2rem;
+  border-radius: 16px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  animation: slideIn 0.4s ease-out;
+}
+
+.message-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 错误消息 */
+.error-macaron {
+  background: linear-gradient(135deg, #FFE8E8 0%, #FFF5F5 100%);
+  color: #E74C3C;
+  border: 2px solid #FFCDD2;
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.12);
+}
+
+/* 成功消息 */
+.success-macaron {
+  background: linear-gradient(135deg, #D4F4E2 0%, #E8F8F0 100%);
+  color: #27AE60;
+  border: 2px solid #A8E6CF;
+  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.12);
+}
+
+/* 提交按钮 */
+.submit-button-macaron {
+  width: 100%;
+  padding: 1.1rem 1.5rem;
+  margin-top: 0.5rem;
+  background: linear-gradient(135deg, #66C2D7 0%, #80D4E3 100%);
+  color: white;
+  border: none;
+  border-radius: 16px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(102, 194, 215, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.submit-button-macaron::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.submit-button-macaron:hover {
+  background: linear-gradient(135deg, #52B8CE 0%, #6CCADC 100%);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(102, 194, 215, 0.4);
+}
+
+.submit-button-macaron:hover::before {
+  left: 100%;
+}
+
+.submit-button-macaron:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 8px rgba(102, 194, 215, 0.25);
+}
+
+.submit-button-macaron:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.submit-button-macaron:disabled:hover {
+  transform: none;
+  box-shadow: 0 4px 12px rgba(102, 194, 215, 0.3);
+}
+
+/* 注册按钮保持相同配色 */
+.register-button-macaron {
+  background: linear-gradient(135deg, #66C2D7 0%, #80D4E3 100%);
+  box-shadow: 0 4px 12px rgba(102, 194, 215, 0.3);
+}
+
+.register-button-macaron:hover {
+  background: linear-gradient(135deg, #52B8CE 0%, #6CCADC 100%);
+  box-shadow: 0 8px 20px rgba(102, 194, 215, 0.4);
+}
+
+/* 按钮加载状态 */
+.button-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.button-loading::after {
+  content: '';
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* 底部链接 */
+.auth-footer-macaron {
+  margin-top: 2rem;
+  text-align: center;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.auth-footer-macaron p {
+  margin: 0;
+  color: #9CA3AF;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.auth-link-macaron {
+  color: #66C2D7;
+  font-weight: 600;
+  cursor: pointer;
+  position: relative;
+  margin-left: 0.3rem;
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.auth-link-macaron::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(135deg, #66C2D7 0%, #52B8CE 100%);
+  transition: width 0.3s ease;
+}
+
+.auth-link-macaron:hover {
+  color: #52B8CE;
+  transform: translateX(2px);
+}
+
+.auth-link-macaron:hover::after {
+  width: 100%;
+}
+
+/* 响应式设计 */
+@media (max-width: 480px) {
+  .auth-container-macaron {
+    padding: 2rem 1.5rem;
+  }
+
+  .auth-title-macaron {
+    font-size: 1.75rem;
+  }
+
+  .auth-subtitle-macaron {
+    font-size: 0.9rem;
+  }
+
+  .form-input-macaron {
+    padding: 0.9rem 1rem;
+    font-size: 0.95rem;
+  }
+
+  .submit-button-macaron {
+    padding: 1rem 1.2rem;
+    font-size: 1rem;
+  }
+}
+
+/* 平滑过渡动画 */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 聚焦可见性增强 */
+.form-input-macaron:focus,
+.password-toggle-macaron:focus,
+.submit-button-macaron:focus,
+.auth-link-macaron:focus {
+  outline: 2px solid rgba(102, 194, 215, 0.5);
+  outline-offset: 2px;
+}
+
+/* 无障碍支持 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
