@@ -71,6 +71,8 @@ func SetupRouter() *gin.Engine {
 
         // 与前端对齐的用户列表路由
         api.GET("/users", userController.GetUsers)
+        // 获取用户总数路由
+        api.GET("/users/count", userController.GetUserCount)
 	}
 
 	return r

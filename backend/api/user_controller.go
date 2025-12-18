@@ -558,3 +558,21 @@ func (c *UserController) DeleteUser(ctx *gin.Context) {
 		Message: "删除用户成功",
 	})
 }
+
+// GetUserCount 获取用户总数
+func (c *UserController) GetUserCount(ctx *gin.Context) {
+	count, err := c.userService.GetUserCount()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, Response{
+			Code:    500,
+			Message: "获取用户总数失败: " + err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, Response{
+		Code:    200,
+		Message: "获取用户总数成功",
+		Data:    count,
+	})
+}

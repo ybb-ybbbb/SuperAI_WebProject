@@ -41,6 +41,20 @@ export const getUserInfo = async () => {
   });
 };
 
+// 获取所有用户
+export const getUsers = async () => {
+  return request('/users', {
+    method: 'GET',
+  });
+};
+
+// 获取用户总数
+export const getUserCount = async () => {
+  return request('/users/count', {
+    method: 'GET',
+  });
+};
+
 // VIP相关API
 
 // 更新自动续期状态
