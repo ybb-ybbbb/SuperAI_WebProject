@@ -1,9 +1,10 @@
 package api
 
 import (
+	"time"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"time"
 )
 
 // SetupRouter 设置路由
@@ -15,7 +16,7 @@ func SetupRouter() *gin.Engine {
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:5173", "http://localhost:5174"}, // 允许前端域名
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
@@ -32,12 +33,23 @@ func SetupRouter() *gin.Engine {
 		{
 			user.POST("/register", userController.Register)
 			user.POST("/login", userController.Login)
-			user.GET("/info", userController.GetUserInfo)
+			user.GET("/info", userController.GetUsers)
+			// 获取单个用户
+			user.GET("/:id", userController.GetUser)
+			// 更新用户基本信息
+			user.PUT("/:id", userController.UpdateUserInfo)
+			// 更新用户密码
+			user.PUT("/:id/password", userController.UpdateUserPassword)
+			// 删除用户
+			user.DELETE("/:id", userController.DeleteUser)
 			// VIP相关路由
 			user.POST("/:id/vip", userController.UpdateUserVip)
 			user.GET("/:id/vip", userController.GetUserVipStatus)
 			user.GET("/:id/vip/check", userController.CheckUserVip)
 		}
+        
+        // 与前端对齐的用户列表路由
+        api.GET("/users", userController.GetUsers)
 	}
 
 	return r

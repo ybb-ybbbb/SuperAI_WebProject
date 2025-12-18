@@ -7,6 +7,7 @@ import (
 
 	"go-react-demo/model"
 	"go-react-demo/service"
+	"go-react-demo/utils"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -153,29 +154,43 @@ func (c *UserController) Login(ctx *gin.Context) {
 		return
 	}
 
+	// 生成JWT Token
+	token, err := utils.GenerateToken(user.ID, user.Username)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, Response{
+			Code:    500,
+			Message: "生成Token失败: " + err.Error(),
+		})
+		return
+	}
+
+	// 返回用户信息和Token
 	ctx.JSON(http.StatusOK, Response{
 		Code:    200,
 		Message: "登录成功",
-		Data:    user,
+		Data: map[string]interface{}{
+			"user":  user,
+			"token": token,
+		},
 	})
 }
 
-// GetUserInfo 获取用户信息
-func (c *UserController) GetUserInfo(ctx *gin.Context) {
+// GetUsers 获取所有用户信息
+func (c *UserController) GetUsers(ctx *gin.Context) {
 	// 这里可以添加JWT认证，获取用户ID
 	// 暂时直接返回所有用户信息
 	users, err := c.userService.GetAllUsers()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, Response{
 			Code:    500,
-			Message: "获取用户信息失败: " + err.Error(),
+			Message: "获取用户列表失败: " + err.Error(),
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, Response{
 		Code:    200,
-		Message: "获取用户信息成功",
+		Message: "获取用户列表成功",
 		Data:    users,
 	})
 }
@@ -310,5 +325,211 @@ func (c *UserController) CheckUserVip(ctx *gin.Context) {
 		Data: map[string]interface{}{
 			"is_valid_vip": isValid,
 		},
+	})
+}
+
+// UpdateUserInfoRequest 更新用户信息请求结构体
+type UpdateUserInfoRequest struct {
+	Username string `json:"username" binding:"required,min=3,max=50"`
+	Email    string `json:"email" binding:"required,email"`
+}
+
+// UpdateUserPasswordRequest 更新密码请求结构体
+type UpdateUserPasswordRequest struct {
+	OldPassword string `json:"old_password" binding:"required"`
+	NewPassword string `json:"new_password" binding:"required,min=6,max=50"`
+}
+
+// GetUser 获取单个用户信息
+func (c *UserController) GetUser(ctx *gin.Context) {
+	// 获取用户ID
+	idStr := ctx.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, Response{
+			Code:    400,
+			Message: "无效的用户ID",
+		})
+		return
+	}
+
+	// 获取用户信息
+	user, err := c.userService.GetUserByID(uint(id))
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			ctx.JSON(http.StatusNotFound, Response{
+				Code:    404,
+				Message: "用户不存在",
+			})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, Response{
+			Code:    500,
+			Message: "获取用户信息失败: " + err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, Response{
+		Code:    200,
+		Message: "获取用户信息成功",
+		Data:    user,
+	})
+}
+
+// UpdateUserInfo 更新用户基本信息
+func (c *UserController) UpdateUserInfo(ctx *gin.Context) {
+	// 获取用户ID
+	idStr := ctx.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, Response{
+			Code:    400,
+			Message: "无效的用户ID",
+		})
+		return
+	}
+
+	// 绑定请求参数
+	var req UpdateUserInfoRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, Response{
+			Code:    400,
+			Message: "请求参数错误: " + err.Error(),
+		})
+		return
+	}
+
+	// 更新用户信息
+	if err := c.userService.UpdateUserInfo(uint(id), req.Username, req.Email); err != nil {
+		ctx.JSON(http.StatusInternalServerError, Response{
+			Code:    500,
+			Message: "更新用户信息失败: " + err.Error(),
+		})
+		return
+	}
+
+	// 获取更新后的用户信息
+	user, err := c.userService.GetUserByID(uint(id))
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, Response{
+			Code:    500,
+			Message: "获取更新后的用户信息失败: " + err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, Response{
+		Code:    200,
+		Message: "更新用户信息成功",
+		Data:    user,
+	})
+}
+
+// UpdateUserPassword 更新用户密码
+func (c *UserController) UpdateUserPassword(ctx *gin.Context) {
+	// 获取用户ID
+	idStr := ctx.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, Response{
+			Code:    400,
+			Message: "无效的用户ID",
+		})
+		return
+	}
+
+	// 绑定请求参数
+	var req UpdateUserPasswordRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, Response{
+			Code:    400,
+			Message: "请求参数错误: " + err.Error(),
+		})
+		return
+	}
+
+	// 验证旧密码
+	user, err := c.userService.GetUserByID(uint(id))
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			ctx.JSON(http.StatusNotFound, Response{
+				Code:    404,
+				Message: "用户不存在",
+			})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, Response{
+			Code:    500,
+			Message: "获取用户信息失败: " + err.Error(),
+		})
+		return
+	}
+
+	if !user.CheckPassword(req.OldPassword) {
+		ctx.JSON(http.StatusUnauthorized, Response{
+			Code:    401,
+			Message: "旧密码错误",
+		})
+		return
+	}
+
+	// 更新密码
+	if err := c.userService.UpdateUserPassword(uint(id), req.NewPassword); err != nil {
+		ctx.JSON(http.StatusInternalServerError, Response{
+			Code:    500,
+			Message: "更新密码失败: " + err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, Response{
+		Code:    200,
+		Message: "更新密码成功",
+	})
+}
+
+// DeleteUser 删除用户
+func (c *UserController) DeleteUser(ctx *gin.Context) {
+	// 获取用户ID
+	idStr := ctx.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, Response{
+			Code:    400,
+			Message: "无效的用户ID",
+		})
+		return
+	}
+
+	// 检查用户是否存在
+	_, err = c.userService.GetUserByID(uint(id))
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			ctx.JSON(http.StatusNotFound, Response{
+				Code:    404,
+				Message: "用户不存在",
+			})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, Response{
+			Code:    500,
+			Message: "检查用户信息失败: " + err.Error(),
+		})
+		return
+	}
+
+	// 删除用户
+	if err := c.userService.DeleteUser(uint(id)); err != nil {
+		ctx.JSON(http.StatusInternalServerError, Response{
+			Code:    500,
+			Message: "删除用户失败: " + err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, Response{
+		Code:    200,
+		Message: "删除用户成功",
 	})
 }

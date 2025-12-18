@@ -33,6 +33,13 @@ const Sidebar = () => {
       isActive: location.pathname === '/profile'
     },
     {
+      id: 'vip',
+      name: 'VIP会员',
+      path: '/vip',
+      icon: '⭐',
+      isActive: location.pathname === '/vip'
+    },
+    {
       id: 'logout',
       name: '退出登录',
       path: '/logout',

@@ -59,6 +59,19 @@ npm install
 npm run dev
 ```
 
+# 终止项目相关的node进程
+```bash
+pkill -f "vite"
+pkill -f "esbuild"
+```
+
+### 指定端口启动前端开发服务器
+```bash
+npm run dev -- --port 5179
+```
+win 端口查询方法
+netstat -ano | findstr :8080
+
 ## 项目说明
 
 这是一个简单的全栈项目示例，展示了如何使用 Go 和 React 构建现代化的 Web 应用。后端提供 API 服务，前端负责用户界面和交互。

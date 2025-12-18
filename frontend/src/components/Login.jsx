@@ -29,10 +29,19 @@ const Login = () => {
       }
       
       const data = await response.json();
-      // 后端直接返回user对象在data字段中，没有token和嵌套的user字段
-      localStorage.setItem('user', JSON.stringify(data.data));
-      // 由于后端没有实现JWT，我们可以使用一个简单的标识来表示登录状态
-      localStorage.setItem('token', 'dummy-token');
+      
+      // 检查后端返回的数据格式，根据实际情况调整
+      // 假设后端返回格式：{ code: 200, message: "", data: { token: "xxx", user: { ... } } }
+      const token = data.data?.token || data.token;
+      const user = data.data?.user || data.data;
+      
+      if (!token || !user) {
+        throw new Error('登录失败：缺少token或用户信息');
+      }
+      
+      // 保存真实的token和用户信息到localStorage
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
       setSuccess('登录成功，正在跳转...');
       
       // 延迟跳转，让用户看到成功提示
@@ -40,16 +49,7 @@ const Login = () => {
         window.location.href = '/dashboard';
       }, 1500);
     } catch (err) {
-      // 提供更友好的错误信息
-      let errorMessage = '登录失败';
-      if (err.message === 'Failed to fetch') {
-        errorMessage = '网络连接失败，请检查网络设置或服务器是否正常运行';
-      } else if (err.message.includes('NetworkError')) {
-        errorMessage = '网络连接异常，请稍后重试';
-      } else {
-        errorMessage = err.message;
-      }
-      setError(errorMessage);
+      setError(err.message);
     } finally {
       setIsLoading(false);
     }
