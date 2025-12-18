@@ -9,7 +9,7 @@ function App() {
   return (
     <div className="app-container">
       <header className="app-header">
-        <h1>用户认证系统</h1>
+        <h1>SuperAI</h1>
       </header>
       <main className="app-main">
         <div className="auth-tabs">
@@ -27,7 +27,7 @@ function App() {
           </button>
         </div>
         <div className="auth-content">
-          {activeTab === 'login' ? <Login /> : <Register />}
+          {activeTab === 'login' ? <Login onTabChange={setActiveTab} /> : <Register onTabChange={setActiveTab} />}
         </div>
       </main>
     </div>

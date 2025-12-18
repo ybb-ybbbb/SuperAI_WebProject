@@ -35,6 +35,19 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   display: inline-block;
+  animation: titlePulse 2s ease-in-out infinite alternate;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+@keyframes titlePulse {
+  from {
+    transform: scale(1);
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+  }
+  to {
+    transform: scale(1.05);
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.6), 0 0 40px rgba(59, 130, 246, 0.4);
+  }
 }
 
 /* Main Content */
@@ -235,15 +248,18 @@
   backdrop-filter: blur(10px);
 }
 
-.auth-switch a {
+.auth-switch a,
+.auth-switch-link {
   color: #3b82f6;
   text-decoration: none;
   font-weight: 600;
   transition: all 0.3s ease;
   position: relative;
+  cursor: pointer;
 }
 
-.auth-switch a::after {
+.auth-switch a::after,
+.auth-switch-link::after {
   content: '';
   position: absolute;
   bottom: -2px;
@@ -254,7 +270,8 @@
   transition: width 0.3s ease;
 }
 
-.auth-switch a:hover::after {
+.auth-switch a:hover::after,
+.auth-switch-link:hover::after {
   width: 100%;
 }
 

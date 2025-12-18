@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const Login = () => {
+const Login = ({ onTabChange }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -102,7 +102,7 @@ const Login = () => {
         </button>
       </form>
       <div className="auth-switch">
-        <p>还没有账号？<a href="#register">注册</a></p>
+        <p>还没有账号？ <span className="auth-switch-link" onClick={() => onTabChange('register')}>注册</span></p>
       </div>
     </div>
   );
