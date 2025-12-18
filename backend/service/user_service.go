@@ -60,11 +60,29 @@ func (s *UserService) GetAllUsers() ([]model.User, error) {
 
 // UpdateUserVip 更新用户VIP信息
 func (s *UserService) UpdateUserVip(id uint, isVip bool, vipStartAt, vipEndAt *time.Time) error {
-	return utils.GetDB().Model(&model.User{}).Where("id = ?", id).Updates(map[string]interface{}{
-		"is_vip":       isVip,
-		"vip_start_at": vipStartAt,
-		"vip_end_at":   vipEndAt,
-	}).Error
+	vipService := NewVipService()
+	
+	// 如果是激活VIP，创建VIP记录
+	if isVip && vipStartAt != nil && vipEndAt != nil {
+		// 先将用户所有VIP记录设置为非激活
+		utils.GetDB().Model(&model.VipRecord{}).Where("user_id = ?", id).Update("is_active", false)
+		
+		// 创建新的VIP记录
+		record := &model.VipRecord{
+			UserID:   id,
+			PlanID:   1, // 默认套餐ID，后续可以根据实际情况修改
+			IsActive: true,
+			StartAt:  *vipStartAt,
+			EndAt:    *vipEndAt,
+		}
+		return vipService.CreateVipRecord(record)
+	} else {
+		// 非激活状态，将所有VIP记录设置为非激活，并更新用户表
+		utils.GetDB().Model(&model.VipRecord{}).Where("user_id = ?", id).Update("is_active", false)
+		return utils.GetDB().Model(&model.User{}).Where("id = ?", id).Updates(map[string]interface{}{
+			"is_vip": false,
+		}).Error
+	}
 }
 
 // GetUserVipStatus 获取用户VIP状态
@@ -76,18 +94,16 @@ func (s *UserService) GetUserVipStatus(id uint) (*model.User, error) {
 
 // CheckUserVip 检查用户是否为有效VIP
 func (s *UserService) CheckUserVip(id uint) (bool, error) {
-	var user model.User
-	err := utils.GetDB().Select("is_vip, vip_end_at").First(&user, id).Error
+	vipService := NewVipService()
+	
+	// 尝试获取用户当前激活的VIP记录
+	record, err := vipService.GetUserActiveVipRecord(id)
 	if err != nil {
-		return false, err
+		return false, nil
 	}
-
-	// 检查是否为VIP且未过期
-	if user.IsVip && user.VipEndAt != nil {
-		return time.Now().Before(*user.VipEndAt), nil
-	}
-
-	return false, nil
+	
+	// 如果有激活的VIP记录，则返回true
+	return record.IsActive && time.Now().Before(record.EndAt), nil
 }
 
 // UpdateUserInfo 更新用户基本信息

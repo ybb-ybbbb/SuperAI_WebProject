@@ -175,10 +175,35 @@ func (c *UserController) Login(ctx *gin.Context) {
 	})
 }
 
+// GetUserInfo 获取当前用户信息
+func (c *UserController) GetUserInfo(ctx *gin.Context) {
+	// 这里应该从JWT Token中获取当前用户ID
+	// 暂时直接返回第一个用户，后续需要添加JWT认证
+	users, err := c.userService.GetAllUsers()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, Response{
+			Code:    500,
+			Message: "获取用户信息失败: " + err.Error(),
+		})
+		return
+	}
+
+	// 暂时返回第一个用户，后续需要根据JWT Token获取当前用户
+	var user *model.User
+	if len(users) > 0 {
+		user = &users[0]
+	}
+
+	ctx.JSON(http.StatusOK, Response{
+		Code:    200,
+		Message: "获取用户信息成功",
+		Data:    user,
+	})
+}
+
 // GetUsers 获取所有用户信息
 func (c *UserController) GetUsers(ctx *gin.Context) {
-	// 这里可以添加JWT认证，获取用户ID
-	// 暂时直接返回所有用户信息
+	// 获取所有用户信息
 	users, err := c.userService.GetAllUsers()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, Response{
