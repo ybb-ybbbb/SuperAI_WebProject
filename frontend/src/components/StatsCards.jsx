@@ -49,10 +49,10 @@ const StatsCards = () => {
     // 获取真实用户总数
     const fetchUserCount = async () => {
       try {
-        const response = await getUserCount();
+        const userCount = await getUserCount();
         setStats(prev => prev.map(stat => {
           if (stat.id === 1) {
-            return { ...stat, value: response.data };
+            return { ...stat, value: userCount };
           }
           return stat;
         }));

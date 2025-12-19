@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaSmile, FaRegMeh, FaCheckCircle } from 'react-icons/fa';
+import { register } from '../utils/api';
 import './AuthMacaron.css';
 
 const Register = ({ onTabChange }) => {
@@ -55,18 +56,7 @@ const Register = ({ onTabChange }) => {
     setIsLoading(true);
     
     try {
-      const response = await fetch('http://localhost:8080/api/user/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, email, password }),
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || '注册失败');
-      }
+      await register(username, password, email);
       
       setSuccess('注册成功，正在跳转到登录页面...');
       setTimeout(() => {

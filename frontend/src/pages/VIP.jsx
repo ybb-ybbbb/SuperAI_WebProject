@@ -74,13 +74,8 @@ const VIP = () => {
   // 获取最新用户信息
   const fetchUserInfo = async () => {
     try {
-      const data = await getUserInfo();
-      let userData = null;
-      
-      if (data.data) {
-        // 如果返回的是单个用户信息
-        userData = data.data;
-      }
+      if (!user || !user.id) return;
+      const userData = await getUserInfo(user.id);
       
       if (userData) {
         setUser(userData);
@@ -117,8 +112,8 @@ const VIP = () => {
     try {
       setIsLoading(true);
       if (!user) return;
-      const data = await getVipOrders(user.id);
-      setOrders(data.data || []);
+      const ordersData = await getVipOrders(user.id);
+      setOrders(ordersData || []);
     } catch (error) {
       console.error('获取订单列表失败:', error);
     } finally {
@@ -131,8 +126,8 @@ const VIP = () => {
     try {
       setIsLoading(true);
       if (!user) return;
-      const data = await getVipHistory(user.id);
-      setHistory(data.data || []);
+      const historyData = await getVipHistory(user.id);
+      setHistory(historyData || []);
     } catch (error) {
       console.error('获取VIP历史记录失败:', error);
     } finally {
@@ -143,11 +138,11 @@ const VIP = () => {
   // 获取VIP套餐列表
   const fetchPlans = async () => {
     try {
-      const data = await getVipPlans();
-      console.log('获取到的VIP套餐数据:', data);
-      if (data.data && Array.isArray(data.data)) {
+      const plansData = await getVipPlans();
+      console.log('获取到的VIP套餐数据:', plansData);
+      if (plansData && Array.isArray(plansData)) {
         // 确保每个套餐都有features属性，并且是数组
-        const formattedPlans = data.data.map(plan => ({
+        const formattedPlans = plansData.map(plan => ({
           ...plan,
           // 处理features：确保是数组，如果是字符串则解析
           features: typeof plan.features === 'string' ? JSON.parse(plan.features) : (plan.features || [])
@@ -182,14 +177,13 @@ const VIP = () => {
       
       // 创建VIP订单
       console.log('创建VIP订单:', plan.id);
-      const orderData = await createVipOrder(user.id, plan.id);
-      const order = orderData.data;
+      const order = await createVipOrder(user.id, plan.id);
       
       // 刷新用户信息
       await fetchUserInfo();
       
       // 显示成功提示
-      alert(`成功创建 ${plan.name} 计划订单！订单号：${order.order_no}`);
+      alert(`成功创建 ${plan.name} 计划订单！订单号：${order.order_no || 'N/A'}`);
       
     } catch (error) {
       console.error('订阅失败:', error);
@@ -346,7 +340,7 @@ const VIP = () => {
                     <div className="plan-header">
                       <h3>{plan.name}</h3>
                       <div className="plan-price">
-                        <span className="price">¥{plan.price}</span>
+                        <span className="price">¥{parseFloat(plan.price).toFixed(2)}</span>
                         <span className="duration">/{plan.duration}天</span>
                       </div>
                     </div>

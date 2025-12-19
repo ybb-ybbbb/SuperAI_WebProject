@@ -81,7 +81,7 @@ frontend/src/
 cd frontend && npm install
 
 # 后端  
-cd backend && go mod tidy
+cd backend_backup_20251219_103342 && go mod tidy
 ```
 
 #### 开发命令
