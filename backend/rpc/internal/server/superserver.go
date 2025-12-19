@@ -24,9 +24,44 @@ func NewSuperServer(svcCtx *svc.ServiceContext) *SuperServer {
 }
 
 // 用户相关服务
+func (s *SuperServer) Register(ctx context.Context, in *rpc.RegisterReq) (*rpc.RegisterResp, error) {
+	l := logic.NewRegisterLogic(ctx, s.svcCtx)
+	return l.Register(in)
+}
+
+func (s *SuperServer) Login(ctx context.Context, in *rpc.LoginReq) (*rpc.LoginResp, error) {
+	l := logic.NewLoginLogic(ctx, s.svcCtx)
+	return l.Login(in)
+}
+
 func (s *SuperServer) GetUserInfo(ctx context.Context, in *rpc.GetUserInfoReq) (*rpc.GetUserInfoResp, error) {
 	l := logic.NewGetUserInfoLogic(ctx, s.svcCtx)
 	return l.GetUserInfo(in)
+}
+
+func (s *SuperServer) GetUser(ctx context.Context, in *rpc.GetUserReq) (*rpc.GetUserResp, error) {
+	l := logic.NewGetUserLogic(ctx, s.svcCtx)
+	return l.GetUser(in)
+}
+
+func (s *SuperServer) UpdateUserInfo(ctx context.Context, in *rpc.UpdateUserInfoReq) (*rpc.UpdateUserInfoResp, error) {
+	l := logic.NewUpdateUserInfoLogic(ctx, s.svcCtx)
+	return l.UpdateUserInfo(in)
+}
+
+func (s *SuperServer) UpdateUserPassword(ctx context.Context, in *rpc.UpdateUserPasswordReq) (*rpc.UpdateUserPasswordResp, error) {
+	l := logic.NewUpdateUserPasswordLogic(ctx, s.svcCtx)
+	return l.UpdateUserPassword(in)
+}
+
+func (s *SuperServer) DeleteUser(ctx context.Context, in *rpc.DeleteUserReq) (*rpc.DeleteUserResp, error) {
+	l := logic.NewDeleteUserLogic(ctx, s.svcCtx)
+	return l.DeleteUser(in)
+}
+
+func (s *SuperServer) UpdateUserVip(ctx context.Context, in *rpc.UpdateUserVipReq) (*rpc.UpdateUserVipResp, error) {
+	l := logic.NewUpdateUserVipLogic(ctx, s.svcCtx)
+	return l.UpdateUserVip(in)
 }
 
 func (s *SuperServer) GetUsers(ctx context.Context, in *rpc.GetUsersReq) (*rpc.GetUsersResp, error) {
@@ -45,6 +80,16 @@ func (s *SuperServer) GetVipPlans(ctx context.Context, in *rpc.GetVipPlansReq) (
 	return l.GetVipPlans(in)
 }
 
+func (s *SuperServer) GetVipPlan(ctx context.Context, in *rpc.GetVipPlanReq) (*rpc.GetVipPlanResp, error) {
+	l := logic.NewGetVipPlanLogic(ctx, s.svcCtx)
+	return l.GetVipPlan(in)
+}
+
+func (s *SuperServer) CreateVipPlan(ctx context.Context, in *rpc.CreateVipPlanReq) (*rpc.CreateVipPlanResp, error) {
+	l := logic.NewCreateVipPlanLogic(ctx, s.svcCtx)
+	return l.CreateVipPlan(in)
+}
+
 // VIP订单相关服务
 func (s *SuperServer) CreateVipOrder(ctx context.Context, in *rpc.CreateVipOrderReq) (*rpc.CreateVipOrderResp, error) {
 	l := logic.NewCreateVipOrderLogic(ctx, s.svcCtx)
@@ -60,6 +105,11 @@ func (s *SuperServer) GetVipOrders(ctx context.Context, in *rpc.GetVipOrdersReq)
 func (s *SuperServer) GetVipRecords(ctx context.Context, in *rpc.GetVipRecordsReq) (*rpc.GetVipRecordsResp, error) {
 	l := logic.NewGetVipRecordsLogic(ctx, s.svcCtx)
 	return l.GetVipRecords(in)
+}
+
+func (s *SuperServer) GetUserActiveVipRecord(ctx context.Context, in *rpc.GetUserActiveVipRecordReq) (*rpc.GetUserActiveVipRecordResp, error) {
+	l := logic.NewGetUserActiveVipRecordLogic(ctx, s.svcCtx)
+	return l.GetUserActiveVipRecord(in)
 }
 
 // VIP状态相关服务

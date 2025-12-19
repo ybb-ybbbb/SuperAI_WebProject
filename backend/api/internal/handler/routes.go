@@ -22,9 +22,39 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: user.GetUserInfoHandler(serverCtx),
 			},
 			{
+				Method:  http.MethodPut,
+				Path:    "/api/user/:user_id",
+				Handler: user.UpdateUserInfoHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodDelete,
+				Path:    "/api/user/:user_id",
+				Handler: user.DeleteUserHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/user/:user_id/detail",
+				Handler: user.GetUserHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPut,
+				Path:    "/api/user/:user_id/password",
+				Handler: user.UpdateUserPasswordHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/user/:user_id/vip",
+				Handler: user.UpdateUserVipHandler(serverCtx),
+			},
+			{
 				Method:  http.MethodGet,
 				Path:    "/api/user/:user_id/vip",
 				Handler: user.GetUserVipStatusHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/user/:user_id/vip/active",
+				Handler: user.GetUserActiveVipRecordHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPut,
@@ -57,6 +87,16 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: user.SyncUserVipStatusHandler(serverCtx),
 			},
 			{
+				Method:  http.MethodPost,
+				Path:    "/api/user/login",
+				Handler: user.LoginHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/user/register",
+				Handler: user.RegisterHandler(serverCtx),
+			},
+			{
 				Method:  http.MethodGet,
 				Path:    "/api/users",
 				Handler: user.GetUsersHandler(serverCtx),
@@ -75,6 +115,16 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodGet,
 				Path:    "/api/vip/plans",
 				Handler: vip.GetVipPlansHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/vip/plans",
+				Handler: vip.CreateVipPlanHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/vip/plans/:plan_id",
+				Handler: vip.GetVipPlanHandler(serverCtx),
 			},
 		},
 	)

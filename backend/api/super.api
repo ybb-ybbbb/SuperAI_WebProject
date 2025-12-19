@@ -68,8 +68,47 @@ type VipRecord {
 type EmptyReq {}
 
 // 用户相关请求
+type RegisterReq {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Email    string `json:"email"`
+}
+
+type LoginReq {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 type GetUserInfoReq {
 	UserId string `path:"user_id"`
+}
+
+type GetUserReq {
+	UserId string `path:"user_id"`
+}
+
+type UpdateUserInfoReq {
+	UserId   string `path:"user_id"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Avatar   string `json:"avatar"`
+}
+
+type UpdateUserPasswordReq {
+	UserId      string `path:"user_id"`
+	OldPassword string `json:"old_password"`
+	NewPassword string `json:"new_password"`
+}
+
+type DeleteUserReq {
+	UserId string `path:"user_id"`
+}
+
+type UpdateUserVipReq {
+	UserId     string `path:"user_id"`
+	IsVip      bool   `json:"is_vip"`
+	VipExpires string `json:"vip_expires"`
 }
 
 type GetUsersReq {
@@ -78,6 +117,17 @@ type GetUsersReq {
 }
 
 // VIP相关请求
+type GetVipPlanReq {
+	PlanId string `path:"plan_id"`
+}
+
+type CreateVipPlanReq {
+	Name         string  `json:"name"`
+	Description  string  `json:"description"`
+	Price        float64 `json:"price"`
+	DurationDays int     `json:"duration_days"`
+}
+
 type UpdateAutoRenewReq {
 	UserId    string `path:"user_id"`
 	AutoRenew bool   `json:"auto_renew"`
@@ -108,11 +158,53 @@ type SyncUserVipStatusReq {
 	UserId string `path:"user_id"`
 }
 
+type GetUserActiveVipRecordReq {
+	UserId string `path:"user_id"`
+}
+
 // 通用响应
 type EmptyResp {}
 
 // 用户相关响应
+type RegisterResp {
+	BaseResp
+	Data User `json:"data"`
+}
+
+type LoginData {
+	User  User   `json:"user"`
+	Token string `json:"token"`
+}
+
+type LoginResp {
+	BaseResp
+	Data LoginData `json:"data"`
+}
+
 type GetUserInfoResp {
+	BaseResp
+	Data User `json:"data"`
+}
+
+type GetUserResp {
+	BaseResp
+	Data User `json:"data"`
+}
+
+type UpdateUserInfoResp {
+	BaseResp
+	Data User `json:"data"`
+}
+
+type UpdateUserPasswordResp {
+	BaseResp
+}
+
+type DeleteUserResp {
+	BaseResp
+}
+
+type UpdateUserVipResp {
 	BaseResp
 	Data User `json:"data"`
 }
@@ -129,6 +221,16 @@ type GetUserCountResp {
 }
 
 // VIP相关响应
+type GetVipPlanResp {
+	BaseResp
+	Data VipPlan `json:"data"`
+}
+
+type CreateVipPlanResp {
+	BaseResp
+	Data VipPlan `json:"data"`
+}
+
 type GetVipPlansResp {
 	BaseResp
 	Data []VipPlan `json:"data"`
@@ -149,6 +251,11 @@ type GetVipHistoryResp {
 	BaseResp
 	Data  []VipRecord `json:"data"`
 	Total int         `json:"total"`
+}
+
+type GetUserActiveVipRecordResp {
+	BaseResp
+	Data VipRecord `json:"data"`
 }
 
 // 嵌套类型定义
@@ -184,8 +291,29 @@ type SyncUserVipStatusResp {
 	group: user
 )
 service Super {
+	@handler register
+	post /api/user/register (RegisterReq) returns (RegisterResp)
+
+	@handler login
+	post /api/user/login (LoginReq) returns (LoginResp)
+
 	@handler getUserInfo
 	get /api/user/:user_id (GetUserInfoReq) returns (GetUserInfoResp)
+
+	@handler getUser
+	get /api/user/:user_id/detail (GetUserReq) returns (GetUserResp)
+
+	@handler updateUserInfo
+	put /api/user/:user_id (UpdateUserInfoReq) returns (UpdateUserInfoResp)
+
+	@handler updateUserPassword
+	put /api/user/:user_id/password (UpdateUserPasswordReq) returns (UpdateUserPasswordResp)
+
+	@handler deleteUser
+	delete /api/user/:user_id (DeleteUserReq) returns (DeleteUserResp)
+
+	@handler updateUserVip
+	post /api/user/:user_id/vip (UpdateUserVipReq) returns (UpdateUserVipResp)
 
 	@handler getUsers
 	get /api/users (GetUsersReq) returns (GetUsersResp)
@@ -214,6 +342,9 @@ service Super {
 
 	@handler createVipOrder
 	post /api/user/:user_id/vip/orders (CreateVipOrderReq) returns (CreateVipOrderResp)
+
+	@handler getUserActiveVipRecord
+	get /api/user/:user_id/vip/active (GetUserActiveVipRecordReq) returns (GetUserActiveVipRecordResp)
 }
 
 // VIP相关API服务
@@ -223,5 +354,11 @@ service Super {
 service Super {
 	@handler getVipPlans
 	get /api/vip/plans (EmptyReq) returns (GetVipPlansResp)
+
+	@handler getVipPlan
+	get /api/vip/plans/:plan_id (GetVipPlanReq) returns (GetVipPlanResp)
+
+	@handler createVipPlan
+	post /api/vip/plans (CreateVipPlanReq) returns (CreateVipPlanResp)
 }
 
