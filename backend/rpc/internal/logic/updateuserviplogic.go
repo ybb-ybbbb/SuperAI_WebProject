@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"backend/model"
+	"backend/rpc/internal/errorx"
 	"backend/rpc/internal/svc"
 	"backend/rpc/pb/rpc"
 
@@ -32,13 +33,7 @@ func (l *UpdateUserVipLogic) UpdateUserVip(in *rpc.UpdateUserVipReq) (*rpc.Updat
 	result := l.svcCtx.DB.First(&user, in.UserId)
 	if result.Error != nil {
 		l.Error("查找用户失败: ", result.Error)
-		return &rpc.UpdateUserVipResp{
-			Base: &rpc.BaseResp{
-				Code:    404,
-				Message: "用户不存在",
-				Success: false,
-			},
-		}, nil
+		return nil, errorx.NotFound("用户不存在")
 	}
 
 	// 2. 更新用户VIP状态
@@ -48,13 +43,7 @@ func (l *UpdateUserVipLogic) UpdateUserVip(in *rpc.UpdateUserVipReq) (*rpc.Updat
 		vipExpires, err := time.Parse("2006-01-02 15:04:05", in.VipExpires)
 		if err != nil {
 			l.Error("解析VIP过期时间失败: ", err)
-			return &rpc.UpdateUserVipResp{
-				Base: &rpc.BaseResp{
-					Code:    400,
-					Message: "VIP过期时间格式不正确",
-					Success: false,
-				},
-			}, nil
+			return nil, errorx.InvalidArgument("VIP过期时间格式不正确")
 		}
 
 		// 将用户所有VIP记录设置为非激活
@@ -73,13 +62,7 @@ func (l *UpdateUserVipLogic) UpdateUserVip(in *rpc.UpdateUserVipReq) (*rpc.Updat
 		// 保存VIP记录
 		if err := l.svcCtx.DB.Create(&vipRecord).Error; err != nil {
 			l.Error("创建VIP记录失败: ", err)
-			return &rpc.UpdateUserVipResp{
-				Base: &rpc.BaseResp{
-					Code:    500,
-					Message: "更新VIP状态失败，请稍后重试",
-					Success: false,
-				},
-			}, err
+			return nil, errorx.Internal("更新VIP状态失败，请稍后重试")
 		}
 
 		// 更新用户VIP状态
@@ -99,13 +82,7 @@ func (l *UpdateUserVipLogic) UpdateUserVip(in *rpc.UpdateUserVipReq) (*rpc.Updat
 	// 3. 保存用户信息
 	if err := l.svcCtx.DB.Save(&user).Error; err != nil {
 		l.Error("更新用户VIP状态失败: ", err)
-		return &rpc.UpdateUserVipResp{
-			Base: &rpc.BaseResp{
-				Code:    500,
-				Message: "更新VIP状态失败，请稍后重试",
-				Success: false,
-			},
-		}, err
+		return nil, errorx.Internal("更新VIP状态失败，请稍后重试")
 	}
 
 	// 4. 构建响应
@@ -115,11 +92,6 @@ func (l *UpdateUserVipLogic) UpdateUserVip(in *rpc.UpdateUserVipReq) (*rpc.Updat
 	}
 
 	return &rpc.UpdateUserVipResp{
-		Base: &rpc.BaseResp{
-			Code:    200,
-			Message: "更新VIP状态成功",
-			Success: true,
-		},
 		User: &rpc.User{
 			Id:           strconv.Itoa(int(user.ID)),
 			Username:     user.Username,

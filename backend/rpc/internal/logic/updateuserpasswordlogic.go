@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"backend/model"
+	"backend/rpc/internal/errorx"
 	"backend/rpc/internal/svc"
 	"backend/rpc/pb/rpc"
 
@@ -30,24 +31,12 @@ func (l *UpdateUserPasswordLogic) UpdateUserPassword(in *rpc.UpdateUserPasswordR
 	result := l.svcCtx.DB.First(&user, in.UserId)
 	if result.Error != nil {
 		l.Error("查找用户失败: ", result.Error)
-		return &rpc.UpdateUserPasswordResp{
-			Base: &rpc.BaseResp{
-				Code:    404,
-				Message: "用户不存在",
-				Success: false,
-			},
-		}, nil
+		return nil, errorx.NotFound("用户不存在")
 	}
 
 	// 2. 验证旧密码
 	if !user.CheckPassword(in.OldPassword) {
-		return &rpc.UpdateUserPasswordResp{
-			Base: &rpc.BaseResp{
-				Code:    400,
-				Message: "旧密码不正确",
-				Success: false,
-			},
-		}, nil
+		return nil, errorx.InvalidArgument("旧密码不正确")
 	}
 
 	// 3. 更新密码
@@ -55,21 +44,9 @@ func (l *UpdateUserPasswordLogic) UpdateUserPassword(in *rpc.UpdateUserPasswordR
 	err := l.svcCtx.DB.Save(&user).Error
 	if err != nil {
 		l.Error("更新密码失败: ", err)
-		return &rpc.UpdateUserPasswordResp{
-			Base: &rpc.BaseResp{
-				Code:    500,
-				Message: "更新密码失败，请稍后重试",
-				Success: false,
-			},
-		}, err
+		return nil, errorx.Internal("更新密码失败，请稍后重试")
 	}
 
 	// 4. 构建响应
-	return &rpc.UpdateUserPasswordResp{
-		Base: &rpc.BaseResp{
-			Code:    200,
-			Message: "密码更新成功",
-			Success: true,
-		},
-	}, nil
+	return &rpc.UpdateUserPasswordResp{}, nil
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"backend/model"
+	"backend/rpc/internal/errorx"
 	"backend/rpc/internal/svc"
 	"backend/rpc/pb/rpc"
 
@@ -30,13 +31,7 @@ func (l *GetVipPlansLogic) GetVipPlans(in *rpc.GetVipPlansReq) (*rpc.GetVipPlans
 	result := l.svcCtx.DB.Find(&plans)
 	if result.Error != nil {
 		l.Errorf("获取VIP套餐失败: %v", result.Error)
-		return &rpc.GetVipPlansResp{
-			Base: &rpc.BaseResp{
-				Code:    500,
-				Message: "获取VIP套餐失败: " + result.Error.Error(),
-				Success: false,
-			},
-		}, nil
+		return nil, errorx.Internal("获取VIP套餐失败: " + result.Error.Error())
 	}
 
 	// 构建响应
@@ -54,11 +49,6 @@ func (l *GetVipPlansLogic) GetVipPlans(in *rpc.GetVipPlansReq) (*rpc.GetVipPlans
 	}
 
 	return &rpc.GetVipPlansResp{
-		Base: &rpc.BaseResp{
-			Code:    200,
-			Message: "获取VIP套餐成功",
-			Success: true,
-		},
 		Plans: respPlans,
 	}, nil
 }

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"backend/model"
+	"backend/rpc/internal/errorx"
 	"backend/rpc/internal/svc"
 	"backend/rpc/pb/rpc"
 
@@ -30,14 +31,8 @@ func (l *SyncUserVipStatusLogic) SyncUserVipStatus(in *rpc.SyncUserVipStatusReq)
 	var user model.User
 	result := l.svcCtx.DB.First(&user, in.UserId)
 	if result.Error != nil {
-		return &rpc.SyncUserVipStatusResp{
-			Base: &rpc.BaseResp{
-				Code:    404,
-				Message: "用户不存在",
-				Success: false,
-			},
-			IsVip: false,
-		}, nil
+		l.Error("查找用户失败: ", result.Error)
+		return nil, errorx.NotFound("用户不存在")
 	}
 
 	// 检查用户的VIP记录，更新VIP状态
@@ -55,11 +50,6 @@ func (l *SyncUserVipStatusLogic) SyncUserVipStatus(in *rpc.SyncUserVipStatusReq)
 	}
 
 	return &rpc.SyncUserVipStatusResp{
-		Base: &rpc.BaseResp{
-			Code:    200,
-			Message: "同步VIP状态成功",
-			Success: true,
-		},
 		IsVip:     isVip,
 		ExpiresAt: vipEndAt,
 	}, nil

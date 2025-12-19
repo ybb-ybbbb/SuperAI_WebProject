@@ -31,6 +31,7 @@ func (l *UpdateAutoRenewLogic) UpdateAutoRenew(req *types.UpdateAutoRenewReq) (r
 		AutoRenew: req.AutoRenew,
 	})
 	if err != nil {
+		l.Errorf("调用RPC服务失败: %v", err)
 		return &types.EmptyResp{}, err
 	}
 

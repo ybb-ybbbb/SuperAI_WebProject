@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"backend/model"
+	"backend/rpc/internal/errorx"
 	"backend/rpc/internal/svc"
 	"backend/rpc/pb/rpc"
 
@@ -48,13 +49,8 @@ func (l *GetVipOrdersLogic) GetVipOrders(in *rpc.GetVipOrdersReq) (*rpc.GetVipOr
 	// 分页查询，预加载套餐信息
 	result := l.svcCtx.DB.Preload("Plan").Where("user_id = ?", in.UserId).Offset(int(offset)).Limit(int(pageSize)).Find(&orders)
 	if result.Error != nil {
-		return &rpc.GetVipOrdersResp{
-			Base: &rpc.BaseResp{
-				Code:    500,
-				Message: "获取订单列表失败",
-				Success: false,
-			},
-		}, nil
+		l.Error("获取订单列表失败: ", result.Error)
+		return nil, errorx.Internal("获取订单列表失败: " + result.Error.Error())
 	}
 
 	// 构建响应
@@ -79,11 +75,6 @@ func (l *GetVipOrdersLogic) GetVipOrders(in *rpc.GetVipOrdersReq) (*rpc.GetVipOr
 	}
 
 	return &rpc.GetVipOrdersResp{
-		Base: &rpc.BaseResp{
-			Code:    200,
-			Message: "获取订单列表成功",
-			Success: true,
-		},
 		Orders: respOrders,
 		Total:  int32(total),
 	}, nil

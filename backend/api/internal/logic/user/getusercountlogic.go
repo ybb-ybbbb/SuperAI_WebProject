@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 
+	"backend/api/internal/common"
 	"backend/api/internal/svc"
 	"backend/api/internal/types"
 	"backend/rpc/pb/rpc"
@@ -29,21 +30,13 @@ func (l *GetUserCountLogic) GetUserCount(req *types.EmptyReq) (resp *types.GetUs
 	rpcResp, err := l.svcCtx.SuperRpcClient.GetUserCount(l.ctx, &rpc.GetUserCountReq{})
 	if err != nil {
 		return &types.GetUserCountResp{
-			BaseResp: types.BaseResp{
-				Code:    500,
-				Message: "调用RPC服务失败: " + err.Error(),
-				Success: false,
-			},
-			Data: 0,
+			BaseResp: common.HandleRPCError(err, ""),
+			Data:     0,
 		}, nil
 	}
 
 	return &types.GetUserCountResp{
-		BaseResp: types.BaseResp{
-			Code:    int(rpcResp.Base.Code),
-			Message: rpcResp.Base.Message,
-			Success: rpcResp.Base.Success,
-		},
-		Data: int(rpcResp.Count),
+		BaseResp: common.HandleRPCError(nil, "获取用户数量成功"),
+		Data:     int(rpcResp.Count),
 	}, nil
 }

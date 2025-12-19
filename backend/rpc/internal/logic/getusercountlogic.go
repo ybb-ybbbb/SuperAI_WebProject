@@ -30,11 +30,6 @@ func (l *GetUserCountLogic) GetUserCount(in *rpc.GetUserCountReq) (*rpc.GetUserC
 	l.svcCtx.DB.Model(&model.User{}).Count(&total)
 
 	return &rpc.GetUserCountResp{
-		Base: &rpc.BaseResp{
-			Code:    200,
-			Message: "获取用户总数成功",
-			Success: true,
-		},
 		Count: int32(total),
 	}, nil
 }

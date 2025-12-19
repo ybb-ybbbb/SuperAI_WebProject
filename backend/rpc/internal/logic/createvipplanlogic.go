@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"backend/model"
+	"backend/rpc/internal/errorx"
 	"backend/rpc/internal/svc"
 	"backend/rpc/pb/rpc"
 
@@ -38,22 +39,11 @@ func (l *CreateVipPlanLogic) CreateVipPlan(in *rpc.CreateVipPlanReq) (*rpc.Creat
 	err := l.svcCtx.DB.Create(&plan).Error
 	if err != nil {
 		l.Error("创建VIP套餐失败: ", err)
-		return &rpc.CreateVipPlanResp{
-			Base: &rpc.BaseResp{
-				Code:    500,
-				Message: "创建VIP套餐失败，请稍后重试",
-				Success: false,
-			},
-		}, err
+		return nil, errorx.Internal("创建VIP套餐失败，请稍后重试")
 	}
 
 	// 3. 构建响应
 	return &rpc.CreateVipPlanResp{
-		Base: &rpc.BaseResp{
-			Code:    200,
-			Message: "创建VIP套餐成功",
-			Success: true,
-		},
 		Plan: &rpc.VipPlan{
 			Id:           strconv.Itoa(int(plan.ID)),
 			Name:         plan.Name,

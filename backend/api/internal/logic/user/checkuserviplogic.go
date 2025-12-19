@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 
+	"backend/api/internal/common"
 	"backend/api/internal/svc"
 	"backend/api/internal/types"
 	"backend/rpc/pb/rpc"
@@ -31,21 +32,13 @@ func (l *CheckUserVipLogic) CheckUserVip(req *types.CheckUserVipReq) (resp *type
 	})
 	if err != nil {
 		return &types.CheckUserVipResp{
-			BaseResp: types.BaseResp{
-				Code:    500,
-				Message: "调用RPC服务失败: " + err.Error(),
-				Success: false,
-			},
-			Data: false,
+			BaseResp: common.HandleRPCError(err, ""),
+			Data:     false,
 		}, nil
 	}
 
 	return &types.CheckUserVipResp{
-		BaseResp: types.BaseResp{
-			Code:    int(rpcResp.Base.Code),
-			Message: rpcResp.Base.Message,
-			Success: rpcResp.Base.Success,
-		},
-		Data: rpcResp.IsVip,
+		BaseResp: common.HandleRPCError(nil, "检查用户VIP状态成功"),
+		Data:     rpcResp.IsVip,
 	}, nil
 }

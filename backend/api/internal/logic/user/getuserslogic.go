@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 
+	"backend/api/internal/common"
 	"backend/api/internal/svc"
 	"backend/api/internal/types"
 	"backend/rpc/pb/rpc"
@@ -32,13 +33,9 @@ func (l *GetUsersLogic) GetUsers(req *types.GetUsersReq) (resp *types.GetUsersRe
 	})
 	if err != nil {
 		return &types.GetUsersResp{
-			BaseResp: types.BaseResp{
-				Code:    500,
-				Message: "调用RPC服务失败: " + err.Error(),
-				Success: false,
-			},
-			Data:  nil,
-			Total: 0,
+			BaseResp: common.HandleRPCError(err, ""),
+			Data:     nil,
+			Total:    0,
 		}, nil
 	}
 
@@ -59,12 +56,8 @@ func (l *GetUsersLogic) GetUsers(req *types.GetUsersReq) (resp *types.GetUsersRe
 	}
 
 	return &types.GetUsersResp{
-		BaseResp: types.BaseResp{
-			Code:    int(rpcResp.Base.Code),
-			Message: rpcResp.Base.Message,
-			Success: rpcResp.Base.Success,
-		},
-		Data:  respUsers,
-		Total: int(rpcResp.Total),
+		BaseResp: common.HandleRPCError(nil, "获取用户列表成功"),
+		Data:     respUsers,
+		Total:    int(rpcResp.Total),
 	}, nil
 }

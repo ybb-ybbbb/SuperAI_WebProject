@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"backend/model"
+	"backend/rpc/internal/errorx"
 	"backend/rpc/internal/svc"
 	"backend/rpc/pb/rpc"
 
@@ -31,13 +32,7 @@ func (l *UpdateUserInfoLogic) UpdateUserInfo(in *rpc.UpdateUserInfoReq) (*rpc.Up
 	result := l.svcCtx.DB.First(&user, in.UserId)
 	if result.Error != nil {
 		l.Error("查找用户失败: ", result.Error)
-		return &rpc.UpdateUserInfoResp{
-			Base: &rpc.BaseResp{
-				Code:    404,
-				Message: "用户不存在",
-				Success: false,
-			},
-		}, nil
+		return nil, errorx.NotFound("用户不存在")
 	}
 
 	// 2. 更新用户信息
@@ -52,13 +47,7 @@ func (l *UpdateUserInfoLogic) UpdateUserInfo(in *rpc.UpdateUserInfoReq) (*rpc.Up
 	err := l.svcCtx.DB.Save(&user).Error
 	if err != nil {
 		l.Error("更新用户信息失败: ", err)
-		return &rpc.UpdateUserInfoResp{
-			Base: &rpc.BaseResp{
-				Code:    500,
-				Message: "更新用户信息失败，请稍后重试",
-				Success: false,
-			},
-		}, err
+		return nil, errorx.Internal("更新用户信息失败，请稍后重试")
 	}
 
 	// 4. 构建响应
@@ -68,11 +57,6 @@ func (l *UpdateUserInfoLogic) UpdateUserInfo(in *rpc.UpdateUserInfoReq) (*rpc.Up
 	}
 
 	return &rpc.UpdateUserInfoResp{
-		Base: &rpc.BaseResp{
-			Code:    200,
-			Message: "更新用户信息成功",
-			Success: true,
-		},
 		User: &rpc.User{
 			Id:           strconv.Itoa(int(user.ID)),
 			Username:     user.Username,

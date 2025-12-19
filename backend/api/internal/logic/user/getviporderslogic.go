@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 
+	"backend/api/internal/common"
 	"backend/api/internal/svc"
 	"backend/api/internal/types"
 	"backend/rpc/pb/rpc"
@@ -27,19 +28,15 @@ func NewGetVipOrdersLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetV
 func (l *GetVipOrdersLogic) GetVipOrders(req *types.GetVipOrdersReq) (resp *types.GetVipOrdersResp, err error) {
 	// 调用RPC服务获取VIP订单列表
 	rpcResp, err := l.svcCtx.SuperRpcClient.GetVipOrders(l.ctx, &rpc.GetVipOrdersReq{
-		UserId:    req.UserId,
+		UserId:   req.UserId,
 		Page:     int32(req.Page),
 		PageSize: int32(req.PageSize),
 	})
 	if err != nil {
 		return &types.GetVipOrdersResp{
-			BaseResp: types.BaseResp{
-				Code:    500,
-				Message: "调用RPC服务失败: " + err.Error(),
-				Success: false,
-			},
-			Data:  nil,
-			Total: 0,
+			BaseResp: common.HandleRPCError(err, ""),
+			Data:     nil,
+			Total:    0,
 		}, nil
 	}
 
@@ -59,12 +56,8 @@ func (l *GetVipOrdersLogic) GetVipOrders(req *types.GetVipOrdersReq) (resp *type
 	}
 
 	return &types.GetVipOrdersResp{
-		BaseResp: types.BaseResp{
-			Code:    int(rpcResp.Base.Code),
-			Message: rpcResp.Base.Message,
-			Success: rpcResp.Base.Success,
-		},
-		Data:  respOrders,
-		Total: int(rpcResp.Total),
+		BaseResp: common.HandleRPCError(nil, "获取VIP订单列表成功"),
+		Data:     respOrders,
+		Total:    int(rpcResp.Total),
 	}, nil
 }

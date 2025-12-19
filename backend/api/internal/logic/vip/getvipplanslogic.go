@@ -3,6 +3,7 @@ package vip
 import (
 	"context"
 
+	"backend/api/internal/common"
 	"backend/api/internal/svc"
 	"backend/api/internal/types"
 	"backend/rpc/pb/rpc"
@@ -29,12 +30,8 @@ func (l *GetVipPlansLogic) GetVipPlans(req *types.EmptyReq) (resp *types.GetVipP
 	rpcResp, err := l.svcCtx.SuperRpcClient.GetVipPlans(l.ctx, &rpc.GetVipPlansReq{})
 	if err != nil {
 		return &types.GetVipPlansResp{
-			BaseResp: types.BaseResp{
-				Code:    500,
-				Message: "调用RPC服务失败: " + err.Error(),
-				Success: false,
-			},
-			Data: nil,
+			BaseResp: common.HandleRPCError(err, ""),
+			Data:     nil,
 		}, nil
 	}
 
@@ -53,11 +50,7 @@ func (l *GetVipPlansLogic) GetVipPlans(req *types.EmptyReq) (resp *types.GetVipP
 	}
 
 	return &types.GetVipPlansResp{
-		BaseResp: types.BaseResp{
-			Code:    int(rpcResp.Base.Code),
-			Message: rpcResp.Base.Message,
-			Success: rpcResp.Base.Success,
-		},
-		Data: respPlans,
+		BaseResp: common.HandleRPCError(nil, "获取VIP套餐列表成功"),
+		Data:     respPlans,
 	}, nil
 }

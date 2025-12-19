@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"backend/model"
+	"backend/rpc/internal/errorx"
 	"backend/rpc/internal/svc"
 	"backend/rpc/pb/rpc"
 
@@ -29,14 +30,8 @@ func (l *GetUserVipStatusLogic) GetUserVipStatus(in *rpc.GetUserVipStatusReq) (*
 	var user model.User
 	result := l.svcCtx.DB.First(&user, in.UserId)
 	if result.Error != nil {
-		return &rpc.GetUserVipStatusResp{
-			Base: &rpc.BaseResp{
-				Code:    404,
-				Message: "用户不存在",
-				Success: false,
-			},
-			IsVip: false,
-		}, nil
+		l.Error("查找用户失败: ", result.Error)
+		return nil, errorx.NotFound("用户不存在")
 	}
 
 	vipEndAt := ""
@@ -45,13 +40,8 @@ func (l *GetUserVipStatusLogic) GetUserVipStatus(in *rpc.GetUserVipStatusReq) (*
 	}
 
 	return &rpc.GetUserVipStatusResp{
-		Base: &rpc.BaseResp{
-			Code:    200,
-			Message: "获取VIP状态成功",
-			Success: true,
-		},
-		IsVip:      user.IsVip,
-		ExpiresAt:  vipEndAt,
-		AutoRenew:  false, // 模型中暂时没有auto_renew字段
+		IsVip:     user.IsVip,
+		ExpiresAt: vipEndAt,
+		AutoRenew: false, // 模型中暂时没有auto_renew字段
 	}, nil
 }

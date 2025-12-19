@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"backend/model"
+	"backend/rpc/internal/errorx"
 	"backend/rpc/internal/svc"
 	"backend/rpc/pb/rpc"
 
@@ -31,13 +32,7 @@ func (l *GetUserLogic) GetUser(in *rpc.GetUserReq) (*rpc.GetUserResp, error) {
 	result := l.svcCtx.DB.First(&user, in.UserId)
 	if result.Error != nil {
 		l.Error("查找用户失败: ", result.Error)
-		return &rpc.GetUserResp{
-			Base: &rpc.BaseResp{
-				Code:    404,
-				Message: "用户不存在",
-				Success: false,
-			},
-		}, nil
+		return nil, errorx.NotFound("用户不存在")
 	}
 
 	// 2. 构建响应
@@ -47,11 +42,6 @@ func (l *GetUserLogic) GetUser(in *rpc.GetUserReq) (*rpc.GetUserResp, error) {
 	}
 
 	return &rpc.GetUserResp{
-		Base: &rpc.BaseResp{
-			Code:    200,
-			Message: "获取用户信息成功",
-			Success: true,
-		},
 		User: &rpc.User{
 			Id:           strconv.Itoa(int(user.ID)),
 			Username:     user.Username,

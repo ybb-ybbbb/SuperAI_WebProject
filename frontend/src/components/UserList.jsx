@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getUsers } from '../utils/api';
+import { getUsers, updateUserInfo, updateUserVip, getUser } from '../utils/api';
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
@@ -22,8 +22,8 @@ const UserList = () => {
     setError('');
     
     try {
-      const response = await getUsers();
-      setUsers(response.data);
+      const usersData = await getUsers();
+      setUsers(usersData || []);
     } catch (err) {
       setError(err.message);
       console.error('获取用户列表失败:', err);
@@ -52,18 +52,7 @@ const UserList = () => {
   const handleDelete = async (id) => {
     if (window.confirm('确定要删除这个用户吗？')) {
       try {
-        const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:8080/api/user/${id}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        
-        if (!response.ok) {
-          throw new Error('删除用户失败');
-        }
+        await deleteUser(id);
         
         // 重新获取用户列表
         fetchUsers();
@@ -124,41 +113,13 @@ const UserList = () => {
     if (!editingUser) return;
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8080/api/user/${editingUser.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          username: editFormData.username,
-          email: editFormData.email
-        })
-      });
-      
-      if (!response.ok) {
-        throw new Error('更新用户信息失败');
-      }
+      // 更新用户信息
+      await updateUserInfo(editingUser.id, editFormData.username, editFormData.email, '');
       
       // 更新VIP状态（如果有变化）
       if (editFormData.is_vip !== editingUser.is_vip) {
-        const vipResponse = await fetch(`http://localhost:8080/api/user/${editingUser.id}/vip`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            is_vip: editFormData.is_vip,
-            vip_start_at: new Date().toISOString(),
-            vip_end_at: editFormData.is_vip ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() : null
-          })
-        });
-        
-        if (!vipResponse.ok) {
-          throw new Error('更新VIP状态失败');
-        }
+        const vipExpires = editFormData.is_vip ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() : '';
+        await updateUserVip(editingUser.id, editFormData.is_vip, vipExpires);
       }
       
       // 重新获取用户列表
@@ -170,24 +131,8 @@ const UserList = () => {
         const parsedUser = JSON.parse(storedUser);
         if (parsedUser.id === editingUser.id) {
           // 重新获取最新的用户信息
-          const token = localStorage.getItem('token');
-          const userResponse = await fetch('http://localhost:8080/api/user/info', {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            }
-          });
-          
-          if (userResponse.ok) {
-            const userData = await userResponse.json();
-            if (userData.data && Array.isArray(userData.data)) {
-              const updatedUser = userData.data.find(u => u.id === parsedUser.id);
-              if (updatedUser) {
-                localStorage.setItem('user', JSON.stringify(updatedUser));
-              }
-            }
-          }
+          const updatedUser = await getUser(editingUser.id);
+          localStorage.setItem('user', JSON.stringify(updatedUser));
         }
       }
       

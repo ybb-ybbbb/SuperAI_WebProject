@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 
+	"backend/api/internal/common"
 	"backend/api/internal/svc"
 	"backend/api/internal/types"
 	"backend/rpc/pb/rpc"
@@ -30,22 +31,19 @@ func (l *GetUserLogic) GetUser(req *types.GetUserReq) (resp *types.GetUserResp, 
 		UserId: req.UserId,
 	})
 	if err != nil {
-		l.Errorf("调用RPC服务失败: %v", err)
-		return nil, err
+		return &types.GetUserResp{
+			BaseResp: common.HandleRPCError(err, ""),
+		}, nil
 	}
 
 	// 转换为API响应
 	return &types.GetUserResp{
-		BaseResp: types.BaseResp{
-			Code:    int(rpcResp.Base.Code),
-			Message: rpcResp.Base.Message,
-			Success: rpcResp.Base.Success,
-		},
+		BaseResp: common.HandleRPCError(nil, "获取用户信息成功"),
 		Data: types.User{
 			Id:           rpcResp.User.Id,
 			Username:     rpcResp.User.Username,
 			Email:        rpcResp.User.Email,
-			Avatar:       "", // RPC响应中没有Avatar字段，设置为空字符串
+			Avatar:       rpcResp.User.Avatar,
 			CreatedAt:    rpcResp.User.CreatedAt,
 			UpdatedAt:    rpcResp.User.UpdatedAt,
 			IsVip:        rpcResp.User.IsVip,

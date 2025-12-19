@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaSmile, FaRegMeh } from 'react-icons/fa';
+import { login } from '../utils/api';
 import './AuthMacaron.css';
 
 const Login = ({ onTabChange }) => {
@@ -17,23 +18,10 @@ const Login = ({ onTabChange }) => {
     setIsLoading(true);
     
     try {
-      const response = await fetch('http://localhost:8080/api/user/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const loginData = await login('', email, password);
       
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || '登录失败');
-      }
-      
-      const data = await response.json();
-      
-      const token = data.data?.token || data.token;
-      const user = data.data?.user || data.data;
+      const token = loginData.token;
+      const user = loginData.user;
       
       if (!token || !user) {
         throw new Error('登录失败：缺少token或用户信息');
@@ -41,6 +29,7 @@ const Login = ({ onTabChange }) => {
       
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('userId', user.id);
       setSuccess('登录成功，正在跳转...');
       
       setTimeout(() => {

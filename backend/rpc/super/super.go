@@ -14,7 +14,6 @@ import (
 )
 
 type (
-	BaseResp                   = rpc.BaseResp
 	CheckUserVipReq            = rpc.CheckUserVipReq
 	CheckUserVipResp           = rpc.CheckUserVipResp
 	CreateVipOrderReq          = rpc.CreateVipOrderReq

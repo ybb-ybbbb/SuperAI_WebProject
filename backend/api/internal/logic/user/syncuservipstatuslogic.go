@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 
+	"backend/api/internal/common"
 	"backend/api/internal/svc"
 	"backend/api/internal/types"
 	"backend/rpc/pb/rpc"
@@ -31,20 +32,12 @@ func (l *SyncUserVipStatusLogic) SyncUserVipStatus(req *types.SyncUserVipStatusR
 	})
 	if err != nil {
 		return &types.SyncUserVipStatusResp{
-			BaseResp: types.BaseResp{
-				Code:    500,
-				Message: "调用RPC服务失败: " + err.Error(),
-				Success: false,
-			},
+			BaseResp: common.HandleRPCError(err, ""),
 		}, nil
 	}
 
 	return &types.SyncUserVipStatusResp{
-		BaseResp: types.BaseResp{
-			Code:    int(rpcResp.Base.Code),
-			Message: rpcResp.Base.Message,
-			Success: rpcResp.Base.Success,
-		},
+		BaseResp: common.HandleRPCError(nil, "同步用户VIP状态成功"),
 		Data: types.SyncUserVipStatusData{
 			IsVip:     rpcResp.IsVip,
 			ExpiresAt: rpcResp.ExpiresAt,

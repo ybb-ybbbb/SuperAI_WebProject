@@ -3,6 +3,7 @@ package vip
 import (
 	"context"
 
+	"backend/api/internal/common"
 	"backend/api/internal/svc"
 	"backend/api/internal/types"
 	"backend/rpc/pb/rpc"
@@ -31,16 +32,14 @@ func (l *GetVipPlanLogic) GetVipPlan(req *types.GetVipPlanReq) (resp *types.GetV
 	})
 	if err != nil {
 		l.Errorf("调用RPC服务失败: %v", err)
-		return nil, err
+		return &types.GetVipPlanResp{
+			BaseResp: common.HandleRPCError(err, ""),
+		}, nil
 	}
 
 	// 转换为API响应
 	return &types.GetVipPlanResp{
-		BaseResp: types.BaseResp{
-			Code:    int(rpcResp.Base.Code),
-			Message: rpcResp.Base.Message,
-			Success: rpcResp.Base.Success,
-		},
+		BaseResp: common.HandleRPCError(nil, "获取VIP套餐成功"),
 		Data: types.VipPlan{
 			Id:           rpcResp.Plan.Id,
 			Name:         rpcResp.Plan.Name,

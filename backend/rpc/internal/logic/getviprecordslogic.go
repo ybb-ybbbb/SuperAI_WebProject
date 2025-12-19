@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"backend/model"
+	"backend/rpc/internal/errorx"
 	"backend/rpc/internal/svc"
 	"backend/rpc/pb/rpc"
 
@@ -49,13 +50,8 @@ func (l *GetVipRecordsLogic) GetVipRecords(in *rpc.GetVipRecordsReq) (*rpc.GetVi
 	// 分页查询，预加载套餐信息
 	result := l.svcCtx.DB.Preload("Plan").Where("user_id = ?", in.UserId).Offset(int(offset)).Limit(int(pageSize)).Find(&records)
 	if result.Error != nil {
-		return &rpc.GetVipRecordsResp{
-			Base: &rpc.BaseResp{
-				Code:    500,
-				Message: "获取VIP记录失败",
-				Success: false,
-			},
-		}, nil
+		l.Error("获取VIP记录失败: ", result.Error)
+		return nil, errorx.Internal("获取VIP记录失败")
 	}
 
 	// 构建响应
@@ -79,11 +75,6 @@ func (l *GetVipRecordsLogic) GetVipRecords(in *rpc.GetVipRecordsReq) (*rpc.GetVi
 	}
 
 	return &rpc.GetVipRecordsResp{
-		Base: &rpc.BaseResp{
-			Code:    200,
-			Message: "获取VIP记录成功",
-			Success: true,
-		},
 		Records: respRecords,
 		Total:   int32(total),
 	}, nil

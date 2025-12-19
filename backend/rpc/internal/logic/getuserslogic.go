@@ -48,13 +48,7 @@ func (l *GetUsersLogic) GetUsers(in *rpc.GetUsersReq) (*rpc.GetUsersResp, error)
 	// 分页查询
 	result := l.svcCtx.DB.Offset(int(offset)).Limit(int(pageSize)).Find(&users)
 	if result.Error != nil {
-		return &rpc.GetUsersResp{
-			Base: &rpc.BaseResp{
-				Code:    500,
-				Message: "获取用户列表失败",
-				Success: false,
-			},
-		}, nil
+		return nil, result.Error
 	}
 
 	// 构建响应
@@ -78,11 +72,6 @@ func (l *GetUsersLogic) GetUsers(in *rpc.GetUsersReq) (*rpc.GetUsersResp, error)
 	}
 
 	return &rpc.GetUsersResp{
-		Base: &rpc.BaseResp{
-			Code:    200,
-			Message: "获取用户列表成功",
-			Success: true,
-		},
 		Users: respUsers,
 		Total: int32(total),
 	}, nil

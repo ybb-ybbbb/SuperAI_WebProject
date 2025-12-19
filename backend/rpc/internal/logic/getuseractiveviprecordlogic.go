@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"backend/model"
+	"backend/rpc/internal/errorx"
 	"backend/rpc/internal/svc"
 	"backend/rpc/pb/rpc"
 
@@ -32,13 +33,7 @@ func (l *GetUserActiveVipRecordLogic) GetUserActiveVipRecord(in *rpc.GetUserActi
 	result := l.svcCtx.DB.Where("user_id = ? AND is_active = ? AND end_at > ?", in.UserId, true, time.Now()).First(&record)
 	if result.Error != nil {
 		l.Error("查找用户活跃VIP记录失败: ", result.Error)
-		return &rpc.GetUserActiveVipRecordResp{
-			Base: &rpc.BaseResp{
-				Code:    404,
-				Message: "用户没有活跃的VIP记录",
-				Success: false,
-			},
-		}, nil
+		return nil, errorx.NotFound("用户没有活跃的VIP记录")
 	}
 
 	// 2. 查找关联的VIP套餐信息
@@ -47,11 +42,6 @@ func (l *GetUserActiveVipRecordLogic) GetUserActiveVipRecord(in *rpc.GetUserActi
 
 	// 3. 构建响应
 	return &rpc.GetUserActiveVipRecordResp{
-		Base: &rpc.BaseResp{
-			Code:    200,
-			Message: "获取用户活跃VIP记录成功",
-			Success: true,
-		},
 		Record: &rpc.VipRecord{
 			Id:        strconv.Itoa(int(record.ID)),
 			UserId:    strconv.Itoa(int(record.UserID)),

@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 
+	"backend/api/internal/common"
 	"backend/api/internal/svc"
 	"backend/api/internal/types"
 	"backend/rpc/pb/rpc"
@@ -25,21 +26,18 @@ func NewDeleteUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Delete
 }
 
 func (l *DeleteUserLogic) DeleteUser(req *types.DeleteUserReq) (resp *types.DeleteUserResp, err error) {
-	// 调用RPC服务
-	rpcResp, err := l.svcCtx.SuperRpcClient.DeleteUser(l.ctx, &rpc.DeleteUserReq{
+	// 调用RPC服务删除用户
+	_, err = l.svcCtx.SuperRpcClient.DeleteUser(l.ctx, &rpc.DeleteUserReq{
 		UserId: req.UserId,
 	})
 	if err != nil {
-		l.Errorf("调用RPC服务失败: %v", err)
-		return nil, err
+		return &types.DeleteUserResp{
+			BaseResp: common.HandleRPCError(err, ""),
+		}, nil
 	}
 
 	// 转换为API响应
 	return &types.DeleteUserResp{
-		BaseResp: types.BaseResp{
-			Code:    int(rpcResp.Base.Code),
-			Message: rpcResp.Base.Message,
-			Success: rpcResp.Base.Success,
-		},
+		BaseResp: common.HandleRPCError(nil, "删除用户成功"),
 	}, nil
 }

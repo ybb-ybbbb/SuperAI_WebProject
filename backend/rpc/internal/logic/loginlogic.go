@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"backend/model"
+	"backend/rpc/internal/errorx"
 	"backend/rpc/internal/svc"
 	"backend/rpc/pb/rpc"
 	"backend/utils"
@@ -44,48 +45,24 @@ func (l *LoginLogic) Login(in *rpc.LoginReq) (*rpc.LoginResp, error) {
 		err = query.Where("email = ?", in.Email).First(&user).Error
 	} else {
 		// 用户名和邮箱都为空
-		return &rpc.LoginResp{
-			Base: &rpc.BaseResp{
-				Code:    400,
-				Message: "用户名或邮箱不能为空",
-				Success: false,
-			},
-		}, nil
+		return nil, errorx.New(400, "用户名或邮箱不能为空")
 	}
 
 	if err != nil {
 		l.Error("查找用户失败: ", err)
-		return &rpc.LoginResp{
-			Base: &rpc.BaseResp{
-				Code:    401,
-				Message: "用户名或密码错误",
-				Success: false,
-			},
-		}, nil
+		return nil, errorx.New(401, "用户名或密码错误")
 	}
 
 	// 2. 验证密码
 	if !user.CheckPassword(in.Password) {
-		return &rpc.LoginResp{
-			Base: &rpc.BaseResp{
-				Code:    401,
-				Message: "用户名或密码错误",
-				Success: false,
-			},
-		}, nil
+		return nil, errorx.New(401, "用户名或密码错误")
 	}
 
 	// 3. 生成JWT令牌
 	token, err := utils.GenerateToken(user.ID, user.Username)
 	if err != nil {
 		l.Error("生成令牌失败: ", err)
-		return &rpc.LoginResp{
-			Base: &rpc.BaseResp{
-				Code:    500,
-				Message: "登录失败，请稍后重试",
-				Success: false,
-			},
-		}, err
+		return nil, errorx.New(500, "登录失败，请稍后重试")
 	}
 
 	// 4. 构建响应
@@ -95,11 +72,6 @@ func (l *LoginLogic) Login(in *rpc.LoginReq) (*rpc.LoginResp, error) {
 	}
 
 	return &rpc.LoginResp{
-		Base: &rpc.BaseResp{
-			Code:    200,
-			Message: "登录成功",
-			Success: true,
-		},
 		User: &rpc.User{
 			Id:           strconv.Itoa(int(user.ID)),
 			Username:     user.Username,

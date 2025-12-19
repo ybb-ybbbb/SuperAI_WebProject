@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"backend/model"
+	"backend/rpc/internal/errorx"
 	"backend/rpc/internal/svc"
 	"backend/rpc/pb/rpc"
 
@@ -31,26 +32,16 @@ func (l *CreateVipOrderLogic) CreateVipOrder(in *rpc.CreateVipOrderReq) (*rpc.Cr
 	var user model.User
 	userResult := l.svcCtx.DB.First(&user, in.UserId)
 	if userResult.Error != nil {
-		return &rpc.CreateVipOrderResp{
-			Base: &rpc.BaseResp{
-				Code:    404,
-				Message: "用户不存在",
-				Success: false,
-			},
-		}, nil
+		l.Error("查找用户失败: ", userResult.Error)
+		return nil, errorx.NotFound("用户不存在")
 	}
 
 	// 验证套餐是否存在
 	var plan model.VipPlan
 	planResult := l.svcCtx.DB.First(&plan, in.PlanId)
 	if planResult.Error != nil {
-		return &rpc.CreateVipOrderResp{
-			Base: &rpc.BaseResp{
-				Code:    404,
-				Message: "VIP套餐不存在",
-				Success: false,
-			},
-		}, nil
+		l.Error("查找VIP套餐失败: ", planResult.Error)
+		return nil, errorx.NotFound("VIP套餐不存在")
 	}
 
 	// 生成订单号（简化版，使用时间戳+随机数）
@@ -68,22 +59,12 @@ func (l *CreateVipOrderLogic) CreateVipOrder(in *rpc.CreateVipOrderReq) (*rpc.Cr
 
 	createResult := l.svcCtx.DB.Create(&order)
 	if createResult.Error != nil {
-		return &rpc.CreateVipOrderResp{
-			Base: &rpc.BaseResp{
-				Code:    500,
-				Message: "创建订单失败",
-				Success: false,
-			},
-		}, nil
+		l.Error("创建订单失败: ", createResult.Error)
+		return nil, errorx.Internal("创建订单失败")
 	}
 
 	// 构建响应
 	return &rpc.CreateVipOrderResp{
-		Base: &rpc.BaseResp{
-			Code:    200,
-			Message: "创建订单成功",
-			Success: true,
-		},
 		Order: &rpc.VipOrder{
 			Id:        string(rune(order.ID)),
 			UserId:    in.UserId,

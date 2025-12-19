@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"backend/model"
+	"backend/rpc/internal/errorx"
 	"backend/rpc/internal/svc"
 	"backend/rpc/pb/rpc"
 
@@ -29,13 +30,8 @@ func (l *GetUserInfoLogic) GetUserInfo(in *rpc.GetUserInfoReq) (*rpc.GetUserInfo
 	var user model.User
 	result := l.svcCtx.DB.First(&user, in.UserId)
 	if result.Error != nil {
-		return &rpc.GetUserInfoResp{
-			Base: &rpc.BaseResp{
-				Code:    404,
-				Message: "用户不存在",
-				Success: false,
-			},
-		}, nil
+		l.Error("查找用户失败: ", result.Error)
+		return nil, errorx.NotFound("用户不存在")
 	}
 
 	// 构建响应
@@ -45,11 +41,6 @@ func (l *GetUserInfoLogic) GetUserInfo(in *rpc.GetUserInfoReq) (*rpc.GetUserInfo
 	}
 
 	return &rpc.GetUserInfoResp{
-		Base: &rpc.BaseResp{
-			Code:    200,
-			Message: "获取用户信息成功",
-			Success: true,
-		},
 		User: &rpc.User{
 			Id:           string(rune(user.ID)),
 			Username:     user.Username,

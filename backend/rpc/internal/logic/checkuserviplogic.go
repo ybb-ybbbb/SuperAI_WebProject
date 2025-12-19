@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"backend/model"
+	"backend/rpc/internal/errorx"
 	"backend/rpc/internal/svc"
 	"backend/rpc/pb/rpc"
 
@@ -28,22 +29,11 @@ func (l *CheckUserVipLogic) CheckUserVip(in *rpc.CheckUserVipReq) (*rpc.CheckUse
 	var user model.User
 	result := l.svcCtx.DB.First(&user, in.UserId)
 	if result.Error != nil {
-		return &rpc.CheckUserVipResp{
-			Base: &rpc.BaseResp{
-				Code:    404,
-				Message: "用户不存在",
-				Success: false,
-			},
-			IsVip: false,
-		}, nil
+		l.Error("查找用户失败: ", result.Error)
+		return nil, errorx.NotFound("用户不存在")
 	}
 
 	return &rpc.CheckUserVipResp{
-		Base: &rpc.BaseResp{
-			Code:    200,
-			Message: "检查VIP状态成功",
-			Success: true,
-		},
 		IsVip: user.IsVip,
 	}, nil
 }

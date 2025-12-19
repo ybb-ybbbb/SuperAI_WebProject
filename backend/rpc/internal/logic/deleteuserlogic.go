@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"backend/model"
+	"backend/rpc/internal/errorx"
 	"backend/rpc/internal/svc"
 	"backend/rpc/pb/rpc"
 
@@ -30,34 +31,16 @@ func (l *DeleteUserLogic) DeleteUser(in *rpc.DeleteUserReq) (*rpc.DeleteUserResp
 	result := l.svcCtx.DB.First(&user, in.UserId)
 	if result.Error != nil {
 		l.Error("查找用户失败: ", result.Error)
-		return &rpc.DeleteUserResp{
-			Base: &rpc.BaseResp{
-				Code:    404,
-				Message: "用户不存在",
-				Success: false,
-			},
-		}, nil
+		return nil, errorx.NotFound("用户不存在")
 	}
 
 	// 2. 删除用户
 	err := l.svcCtx.DB.Delete(&user).Error
 	if err != nil {
 		l.Error("删除用户失败: ", err)
-		return &rpc.DeleteUserResp{
-			Base: &rpc.BaseResp{
-				Code:    500,
-				Message: "删除用户失败，请稍后重试",
-				Success: false,
-			},
-		}, err
+		return nil, errorx.Internal("删除用户失败，请稍后重试")
 	}
 
 	// 3. 构建响应
-	return &rpc.DeleteUserResp{
-		Base: &rpc.BaseResp{
-			Code:    200,
-			Message: "用户删除成功",
-			Success: true,
-		},
-	}, nil
+	return &rpc.DeleteUserResp{}, nil
 }

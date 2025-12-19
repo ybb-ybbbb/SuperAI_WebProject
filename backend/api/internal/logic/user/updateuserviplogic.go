@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 
+	"backend/api/internal/common"
 	"backend/api/internal/svc"
 	"backend/api/internal/types"
 	"backend/rpc/pb/rpc"
@@ -32,22 +33,19 @@ func (l *UpdateUserVipLogic) UpdateUserVip(req *types.UpdateUserVipReq) (resp *t
 		VipExpires: req.VipExpires,
 	})
 	if err != nil {
-		l.Errorf("调用RPC服务失败: %v", err)
-		return nil, err
+		return &types.UpdateUserVipResp{
+			BaseResp: common.HandleRPCError(err, ""),
+		}, nil
 	}
 
 	// 转换为API响应
 	return &types.UpdateUserVipResp{
-		BaseResp: types.BaseResp{
-			Code:    int(rpcResp.Base.Code),
-			Message: rpcResp.Base.Message,
-			Success: rpcResp.Base.Success,
-		},
+		BaseResp: common.HandleRPCError(nil, "更新用户VIP状态成功"),
 		Data: types.User{
 			Id:           rpcResp.User.Id,
 			Username:     rpcResp.User.Username,
 			Email:        rpcResp.User.Email,
-			Avatar:       "", // RPC响应中没有Avatar字段，设置为空字符串
+			Avatar:       rpcResp.User.Avatar,
 			CreatedAt:    rpcResp.User.CreatedAt,
 			UpdatedAt:    rpcResp.User.UpdatedAt,
 			IsVip:        rpcResp.User.IsVip,

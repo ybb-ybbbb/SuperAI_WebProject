@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 
+	"backend/api/internal/common"
 	"backend/api/internal/svc"
 	"backend/api/internal/types"
 	"backend/rpc/pb/rpc"
@@ -33,26 +34,24 @@ func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginResp, err erro
 	})
 	if err != nil {
 		l.Errorf("调用RPC服务失败: %v", err)
-		return nil, err
+		return &types.LoginResp{
+			BaseResp: common.HandleRPCError(err, ""),
+		}, nil
 	}
 
 	// 转换为API响应
 	resp = &types.LoginResp{
-		BaseResp: types.BaseResp{
-			Code:    int(rpcResp.Base.Code),
-			Message: rpcResp.Base.Message,
-			Success: rpcResp.Base.Success,
-		},
+		BaseResp: common.HandleRPCError(nil, "登录成功"),
 	}
 
-	// 只有当登录成功且rpcResp.User不为nil时，才设置用户数据
-	if rpcResp.Base.Success && rpcResp.User != nil {
+	// 设置用户数据
+	if rpcResp.User != nil {
 		resp.Data = types.LoginData{
 			User: types.User{
 				Id:           rpcResp.User.Id,
 				Username:     rpcResp.User.Username,
 				Email:        rpcResp.User.Email,
-				Avatar:       "", // RPC响应中没有Avatar字段，设置为空字符串
+				Avatar:       rpcResp.User.Avatar,
 				CreatedAt:    rpcResp.User.CreatedAt,
 				UpdatedAt:    rpcResp.User.UpdatedAt,
 				IsVip:        rpcResp.User.IsVip,

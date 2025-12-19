@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 
+	"backend/api/internal/common"
 	"backend/api/internal/svc"
 	"backend/api/internal/types"
 	"backend/rpc/pb/rpc"
@@ -30,17 +31,14 @@ func (l *GetUserActiveVipRecordLogic) GetUserActiveVipRecord(req *types.GetUserA
 		UserId: req.UserId,
 	})
 	if err != nil {
-		l.Errorf("调用RPC服务失败: %v", err)
-		return nil, err
+		return &types.GetUserActiveVipRecordResp{
+			BaseResp: common.HandleRPCError(err, ""),
+		}, nil
 	}
 
 	// 转换为API响应
 	return &types.GetUserActiveVipRecordResp{
-		BaseResp: types.BaseResp{
-			Code:    int(rpcResp.Base.Code),
-			Message: rpcResp.Base.Message,
-			Success: rpcResp.Base.Success,
-		},
+		BaseResp: common.HandleRPCError(nil, "获取用户活跃VIP记录成功"),
 		Data: types.VipRecord{
 			Id:        rpcResp.Record.Id,
 			UserId:    rpcResp.Record.UserId,
