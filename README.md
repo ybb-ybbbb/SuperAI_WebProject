@@ -34,7 +34,7 @@ go-react-demo/
 
 1. 进入后端目录
 ```bash
-cd backend
+cd backend_backup_20251219_103342
 ```
 
 2. 运行后端服务

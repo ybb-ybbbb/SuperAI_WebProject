@@ -1,0 +1,195 @@
+
+syntax = "proto3";
+
+package super;
+
+option go_package="./rpc";
+
+// 通用响应结构
+message BaseResp {
+  int32 code = 1;
+  string message = 2;
+  bool success = 3;
+}
+
+// 用户相关消息
+message User {
+  string id = 1;
+  string username = 2;
+  string email = 3;
+  string avatar = 4;
+  string created_at = 5;
+  string updated_at = 6;
+  bool is_vip = 7;
+  string vip_expires_at = 8;
+  bool auto_renew = 9;
+}
+
+message GetUserInfoReq {
+  string user_id = 1;
+}
+
+message GetUserInfoResp {
+  BaseResp base = 1;
+  User user = 2;
+}
+
+message GetUsersReq {
+  int32 page = 1;
+  int32 page_size = 2;
+}
+
+message GetUsersResp {
+  BaseResp base = 1;
+  repeated User users = 2;
+  int32 total = 3;
+}
+
+message GetUserCountReq {
+}
+
+message GetUserCountResp {
+  BaseResp base = 1;
+  int32 count = 2;
+}
+
+// VIP套餐相关消息
+message VipPlan {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  float price = 4;
+  int32 duration_days = 5;
+  string created_at = 6;
+  string updated_at = 7;
+}
+
+message GetVipPlansReq {
+}
+
+message GetVipPlansResp {
+  BaseResp base = 1;
+  repeated VipPlan plans = 2;
+}
+
+// VIP订单相关消息
+message VipOrder {
+  string id = 1;
+  string user_id = 2;
+  string plan_id = 3;
+  string plan_name = 4;
+  float amount = 5;
+  string status = 6;
+  string created_at = 7;
+  string paid_at = 8;
+}
+
+message CreateVipOrderReq {
+  string user_id = 1;
+  string plan_id = 2;
+}
+
+message CreateVipOrderResp {
+  BaseResp base = 1;
+  VipOrder order = 2;
+}
+
+message GetVipOrdersReq {
+  string user_id = 1;
+  int32 page = 2;
+  int32 page_size = 3;
+}
+
+message GetVipOrdersResp {
+  BaseResp base = 1;
+  repeated VipOrder orders = 2;
+  int32 total = 3;
+}
+
+// VIP记录相关消息
+message VipRecord {
+  string id = 1;
+  string user_id = 2;
+  string plan_id = 3;
+  string plan_name = 4;
+  string start_at = 5;
+  string end_at = 6;
+  string status = 7;
+  string created_at = 8;
+}
+
+message GetVipRecordsReq {
+  string user_id = 1;
+  int32 page = 2;
+  int32 page_size = 3;
+}
+
+message GetVipRecordsResp {
+  BaseResp base = 1;
+  repeated VipRecord records = 2;
+  int32 total = 3;
+}
+
+// VIP状态相关消息
+message GetUserVipStatusReq {
+  string user_id = 1;
+}
+
+message GetUserVipStatusResp {
+  BaseResp base = 1;
+  bool is_vip = 2;
+  string expires_at = 3;
+  bool auto_renew = 4;
+}
+
+message CheckUserVipReq {
+  string user_id = 1;
+}
+
+message CheckUserVipResp {
+  BaseResp base = 1;
+  bool is_vip = 2;
+}
+
+message UpdateAutoRenewReq {
+  string user_id = 1;
+  bool auto_renew = 2;
+}
+
+message UpdateAutoRenewResp {
+  BaseResp base = 1;
+}
+
+message SyncUserVipStatusReq {
+  string user_id = 1;
+}
+
+message SyncUserVipStatusResp {
+  BaseResp base = 1;
+  bool is_vip = 2;
+  string expires_at = 3;
+}
+
+// 服务定义
+service Super {
+  // 用户相关服务
+  rpc GetUserInfo(GetUserInfoReq) returns (GetUserInfoResp);
+  rpc GetUsers(GetUsersReq) returns (GetUsersResp);
+  rpc GetUserCount(GetUserCountReq) returns (GetUserCountResp);
+  
+  // VIP套餐相关服务
+  rpc GetVipPlans(GetVipPlansReq) returns (GetVipPlansResp);
+  
+  // VIP订单相关服务
+  rpc CreateVipOrder(CreateVipOrderReq) returns (CreateVipOrderResp);
+  rpc GetVipOrders(GetVipOrdersReq) returns (GetVipOrdersResp);
+  
+  // VIP记录相关服务
+  rpc GetVipRecords(GetVipRecordsReq) returns (GetVipRecordsResp);
+  
+  // VIP状态相关服务
+  rpc GetUserVipStatus(GetUserVipStatusReq) returns (GetUserVipStatusResp);
+  rpc CheckUserVip(CheckUserVipReq) returns (CheckUserVipResp);
+  rpc UpdateAutoRenew(UpdateAutoRenewReq) returns (UpdateAutoRenewResp);
+  rpc SyncUserVipStatus(SyncUserVipStatusReq) returns (SyncUserVipStatusResp);
+}
