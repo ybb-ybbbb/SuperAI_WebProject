@@ -22,7 +22,6 @@ super
 # Backend - Generated code
 **/pb/
 **/internal/types/
-*.pb.go
 
 # Frontend - Node.js
 **/node_modules/
@@ -66,6 +65,4 @@ coverage/
 *_backup_*
 *.tar.gz
 
-# AI tool directories
-.trae/
 
