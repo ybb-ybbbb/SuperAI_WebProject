@@ -41,27 +41,12 @@ export const getUserInfo = async () => {
   });
 };
 
-// 获取所有用户
-export const getUsers = async () => {
-  return request('/users', {
-    method: 'GET',
-  });
-};
-
-// 获取用户总数
-export const getUserCount = async () => {
-  return request('/users/count', {
-    method: 'GET',
-  });
-};
-
 // VIP相关API
 
-// 更新自动续期状态
-export const updateAutoRenew = async (userId, autoRenew) => {
-  return request(`/user/${userId}/vip/auto-renew`, {
-    method: 'PUT',
-    body: JSON.stringify({ auto_renew: autoRenew }),
+// 获取当前用户信息
+export const getCurrentUser = async () => {
+  return request('/user/info', {
+    method: 'GET',
   });
 };
 

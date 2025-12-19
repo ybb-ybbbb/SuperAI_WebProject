@@ -5,6 +5,7 @@ import (
 
 	"backend/api/internal/svc"
 	"backend/api/internal/types"
+	"backend/rpc/pb/rpc"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -24,7 +25,34 @@ func NewRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Register
 }
 
 func (l *RegisterLogic) Register(req *types.RegisterReq) (resp *types.RegisterResp, err error) {
-	// todo: add your logic here and delete this line
+	// 调用RPC服务
+	rpcResp, err := l.svcCtx.SuperRpcClient.Register(l.ctx, &rpc.RegisterReq{
+		Username: req.Username,
+		Password: req.Password,
+		Email:    req.Email,
+	})
+	if err != nil {
+		l.Errorf("调用RPC服务失败: %v", err)
+		return nil, err
+	}
 
-	return
+	// 转换为API响应
+	return &types.RegisterResp{
+		BaseResp: types.BaseResp{
+			Code:    int(rpcResp.Base.Code),
+			Message: rpcResp.Base.Message,
+			Success: rpcResp.Base.Success,
+		},
+		Data: types.User{
+			Id:           rpcResp.User.Id,
+			Username:     rpcResp.User.Username,
+			Email:        rpcResp.User.Email,
+			Avatar:       "", // RPC响应中没有Avatar字段，设置为空字符串
+			CreatedAt:    rpcResp.User.CreatedAt,
+			UpdatedAt:    rpcResp.User.UpdatedAt,
+			IsVip:        rpcResp.User.IsVip,
+			VipExpiresAt: rpcResp.User.VipExpiresAt,
+			AutoRenew:    rpcResp.User.AutoRenew,
+		},
+	}, nil
 }

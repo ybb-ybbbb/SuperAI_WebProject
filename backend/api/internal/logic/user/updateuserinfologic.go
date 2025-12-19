@@ -5,6 +5,7 @@ import (
 
 	"backend/api/internal/svc"
 	"backend/api/internal/types"
+	"backend/rpc/pb/rpc"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -24,7 +25,35 @@ func NewUpdateUserInfoLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Up
 }
 
 func (l *UpdateUserInfoLogic) UpdateUserInfo(req *types.UpdateUserInfoReq) (resp *types.UpdateUserInfoResp, err error) {
-	// todo: add your logic here and delete this line
+	// 调用RPC服务
+	rpcResp, err := l.svcCtx.SuperRpcClient.UpdateUserInfo(l.ctx, &rpc.UpdateUserInfoReq{
+		UserId:   req.UserId,
+		Username: req.Username,
+		Email:    req.Email,
+		Avatar:   req.Avatar,
+	})
+	if err != nil {
+		l.Errorf("调用RPC服务失败: %v", err)
+		return nil, err
+	}
 
-	return
+	// 转换为API响应
+	return &types.UpdateUserInfoResp{
+		BaseResp: types.BaseResp{
+			Code:    int(rpcResp.Base.Code),
+			Message: rpcResp.Base.Message,
+			Success: rpcResp.Base.Success,
+		},
+		Data: types.User{
+			Id:           rpcResp.User.Id,
+			Username:     rpcResp.User.Username,
+			Email:        rpcResp.User.Email,
+			Avatar:       "", // RPC响应中没有Avatar字段，设置为空字符串
+			CreatedAt:    rpcResp.User.CreatedAt,
+			UpdatedAt:    rpcResp.User.UpdatedAt,
+			IsVip:        rpcResp.User.IsVip,
+			VipExpiresAt: rpcResp.User.VipExpiresAt,
+			AutoRenew:    rpcResp.User.AutoRenew,
+		},
+	}, nil
 }

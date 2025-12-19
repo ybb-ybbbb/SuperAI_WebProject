@@ -5,6 +5,7 @@ import (
 
 	"backend/api/internal/svc"
 	"backend/api/internal/types"
+	"backend/rpc/pb/rpc"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -24,7 +25,23 @@ func NewUpdateUserPasswordLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 }
 
 func (l *UpdateUserPasswordLogic) UpdateUserPassword(req *types.UpdateUserPasswordReq) (resp *types.UpdateUserPasswordResp, err error) {
-	// todo: add your logic here and delete this line
+	// 调用RPC服务
+	rpcResp, err := l.svcCtx.SuperRpcClient.UpdateUserPassword(l.ctx, &rpc.UpdateUserPasswordReq{
+		UserId:      req.UserId,
+		OldPassword: req.OldPassword,
+		NewPassword: req.NewPassword,
+	})
+	if err != nil {
+		l.Errorf("调用RPC服务失败: %v", err)
+		return nil, err
+	}
 
-	return
+	// 转换为API响应
+	return &types.UpdateUserPasswordResp{
+		BaseResp: types.BaseResp{
+			Code:    int(rpcResp.Base.Code),
+			Message: rpcResp.Base.Message,
+			Success: rpcResp.Base.Success,
+		},
+	}, nil
 }

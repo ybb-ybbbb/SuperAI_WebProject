@@ -75,8 +75,8 @@ type RegisterReq {
 }
 
 type LoginReq {
-	Username string `json:"username"`
-	Email    string `json:"email"`
+	Username string `json:"username,optional"`
+	Email    string `json:"email,optional"`
 	Password string `json:"password"`
 }
 

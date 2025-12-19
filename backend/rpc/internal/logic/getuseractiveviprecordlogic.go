@@ -2,7 +2,10 @@ package logic
 
 import (
 	"context"
+	"strconv"
+	"time"
 
+	"backend/model"
 	"backend/rpc/internal/svc"
 	"backend/rpc/pb/rpc"
 
@@ -24,7 +27,40 @@ func NewGetUserActiveVipRecordLogic(ctx context.Context, svcCtx *svc.ServiceCont
 }
 
 func (l *GetUserActiveVipRecordLogic) GetUserActiveVipRecord(in *rpc.GetUserActiveVipRecordReq) (*rpc.GetUserActiveVipRecordResp, error) {
-	// todo: add your logic here and delete this line
+	// 1. 查找用户当前激活的VIP记录
+	var record model.VipRecord
+	result := l.svcCtx.DB.Where("user_id = ? AND is_active = ? AND end_at > ?", in.UserId, true, time.Now()).First(&record)
+	if result.Error != nil {
+		l.Error("查找用户活跃VIP记录失败: ", result.Error)
+		return &rpc.GetUserActiveVipRecordResp{
+			Base: &rpc.BaseResp{
+				Code:    404,
+				Message: "用户没有活跃的VIP记录",
+				Success: false,
+			},
+		}, nil
+	}
 
-	return &rpc.GetUserActiveVipRecordResp{}, nil
+	// 2. 查找关联的VIP套餐信息
+	var plan model.VipPlan
+	l.svcCtx.DB.First(&plan, record.PlanID)
+
+	// 3. 构建响应
+	return &rpc.GetUserActiveVipRecordResp{
+		Base: &rpc.BaseResp{
+			Code:    200,
+			Message: "获取用户活跃VIP记录成功",
+			Success: true,
+		},
+		Record: &rpc.VipRecord{
+			Id:        strconv.Itoa(int(record.ID)),
+			UserId:    strconv.Itoa(int(record.UserID)),
+			PlanId:    strconv.Itoa(int(record.PlanID)),
+			PlanName:  plan.Name,
+			StartAt:   record.StartAt.Format("2006-01-02 15:04:05"),
+			EndAt:     record.EndAt.Format("2006-01-02 15:04:05"),
+			Status:    "active",
+			CreatedAt: record.CreatedAt.Format("2006-01-02 15:04:05"),
+		},
+	}, nil
 }
