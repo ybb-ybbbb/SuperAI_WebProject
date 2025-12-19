@@ -59,7 +59,7 @@ const Sidebar = () => {
       <div className="sidebar-header">
         <h2 className="sidebar-logo">
           <span className="logo-icon">🚀</span>
-          <span className="logo-text">系统管理</span>
+          <span className="logo-text">管理中心</span>
         </h2>
       </div>
       <nav className="sidebar-nav">

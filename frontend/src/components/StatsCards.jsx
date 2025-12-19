@@ -1,9 +1,12 @@
+import { useState, useEffect } from 'react';
+import { getUserCount } from '../utils/api';
+
 const StatsCards = () => {
-  const stats = [
+  const [stats, setStats] = useState([
     {
       id: 1,
       title: '总用户数',
-      value: 1280,
+      value: 0,
       icon: '👥',
       color: '#646cff',
       trend: '+12%',
@@ -40,7 +43,26 @@ const StatsCards = () => {
       trendType: 'up',
       description: '需要及时处理'
     }
-  ];
+  ]);
+
+  useEffect(() => {
+    // 获取真实用户总数
+    const fetchUserCount = async () => {
+      try {
+        const response = await getUserCount();
+        setStats(prev => prev.map(stat => {
+          if (stat.id === 1) {
+            return { ...stat, value: response.data };
+          }
+          return stat;
+        }));
+      } catch (error) {
+        console.error('获取用户总数失败:', error);
+      }
+    };
+
+    fetchUserCount();
+  }, []);
 
   return (
     <div className="stats-cards-container">

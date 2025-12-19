@@ -58,6 +58,13 @@ func (s *UserService) GetAllUsers() ([]model.User, error) {
 	return users, err
 }
 
+// GetUserCount 获取用户总数
+func (s *UserService) GetUserCount() (int64, error) {
+	var count int64
+	err := utils.GetDB().Model(&model.User{}).Count(&count).Error
+	return count, err
+}
+
 // UpdateUserVip 更新用户VIP信息
 func (s *UserService) UpdateUserVip(id uint, isVip bool, vipStartAt, vipEndAt *time.Time) error {
 	vipService := NewVipService()

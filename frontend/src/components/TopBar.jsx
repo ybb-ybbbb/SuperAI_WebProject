@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { FaCrown } from 'react-icons/fa';
 
 const TopBar = () => {
   const [user, _setUser] = useState(() => {
@@ -90,7 +91,7 @@ const TopBar = () => {
               </span>
               <span className="user-name">
                 {user?.username || '用户'}
-                {user?.is_vip && <span className="vip-badge-small">⭐</span>}
+                {user?.is_vip && <span className="vip-badge-small"><FaCrown /></span>}
               </span>
               <span className="dropdown-arrow">▼</span>
             </button>

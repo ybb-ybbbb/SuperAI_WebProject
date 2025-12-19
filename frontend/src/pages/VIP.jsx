@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { FaCrown, FaStar } from 'react-icons/fa';
 import Sidebar from '../components/Sidebar';
 import TopBar from '../components/TopBar';
 import { getVipOrders, getVipHistory, createVipOrder, getVipPlans, getUserInfo, updateAutoRenew } from '../utils/api';
@@ -148,9 +149,8 @@ const VIP = () => {
         // 确保每个套餐都有features属性，并且是数组
         const formattedPlans = data.data.map(plan => ({
           ...plan,
-          features: plan.features || [],
-          // 如果features是字符串，尝试解析为数组
-          features: typeof plan.features === 'string' ? JSON.parse(plan.features) : plan.features
+          // 处理features：确保是数组，如果是字符串则解析
+          features: typeof plan.features === 'string' ? JSON.parse(plan.features) : (plan.features || [])
         }));
         setVipPlans(formattedPlans);
       }
@@ -264,12 +264,14 @@ const VIP = () => {
                   <h2>您的当前状态</h2>
                   {user.is_vip ? (
                     <div className="vip-active">
-                      <div className="vip-badge-large">⭐</div>
+                      <div className="vip-badge-large"><FaCrown /></div>
                       <h3>尊贵VIP会员</h3>
-                      {user.vip_end_at && (
-                        <p>有效期至：{new Date(user.vip_end_at).toLocaleDateString()}</p>
-                      )}
                       <div className="auto-renew-section">
+                        <div className="vip-expiry-info">
+                          {user.vip_end_at && (
+                            <p className="vip-expiry-date">有效期至：{new Date(user.vip_end_at).toLocaleDateString()}</p>
+                          )}
+                        </div>
                         <label className="auto-renew-label">
                           <input 
                             type="checkbox" 
@@ -286,7 +288,7 @@ const VIP = () => {
                     </div>
                   ) : (
                     <div className="vip-inactive">
-                      <div className="vip-badge-large">📌</div>
+                      <div className="vip-badge-large"><FaStar /></div>
                       <h3>普通用户</h3>
                       <p>立即升级，享受更多权益</p>
                       <button className="upgrade-button" onClick={() => setActiveTab('plans')}>立即升级</button>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getUsers } from '../utils/api';
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
@@ -21,23 +22,11 @@ const UserList = () => {
     setError('');
     
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:8080/api/users', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error('获取用户列表失败');
-      }
-      
-      const data = await response.json();
-      setUsers(data.data);
+      const response = await getUsers();
+      setUsers(response.data);
     } catch (err) {
       setError(err.message);
+      console.error('获取用户列表失败:', err);
     } finally {
       setIsLoading(false);
     }
@@ -207,11 +196,6 @@ const UserList = () => {
     } catch (err) {
       setError(err.message);
     }
-  };
-
-  // 获取状态显示文本
-  const getStatusText = (status) => {
-    return status === 'active' ? '活跃' : '禁用';
   };
 
   // 获取VIP状态显示文本

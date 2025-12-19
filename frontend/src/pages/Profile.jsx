@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { FaCrown, FaStar } from 'react-icons/fa';
 import Sidebar from '../components/Sidebar';
 import TopBar from '../components/TopBar';
 
@@ -212,14 +213,14 @@ const Profile = () => {
               <div className="profile-avatar">
                 <span className="avatar-icon">{user.avatar || '👤'}</span>
                 {user.is_vip && (
-                  <span className="vip-badge">⭐ VIP</span>
+                  <span className="vip-badge"><FaCrown /> VIP</span>
                 )}
               </div>
               <div className="profile-basic-info">
                 <h2 className="profile-name">
                   {user.username}
                   {user.is_vip && (
-                    <span className="vip-tag">⭐ VIP</span>
+                    <span className="vip-tag"><FaCrown /> VIP</span>
                   )}
                 </h2>
                 <p className="profile-email">{user.email}</p>
@@ -366,7 +367,7 @@ const Profile = () => {
                           <div className="info-value">
                             {user.is_vip ? (
                               <span className="vip-status-active">
-                                ⭐ 已开通VIP
+                                <FaCrown /> 已开通VIP
                                 {user.vip_end_at && (
                                   <span className="vip-expiry">
                                     （有效期至：{new Date(user.vip_end_at).toLocaleDateString()}）
