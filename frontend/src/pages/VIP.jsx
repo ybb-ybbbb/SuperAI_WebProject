@@ -340,7 +340,7 @@ const VIP = () => {
                     <div className="plan-header">
                       <h3>{plan.name}</h3>
                       <div className="plan-price">
-                        <span className="price">¥{plan.price}</span>
+                        <span className="price">¥{parseFloat(plan.price).toFixed(2)}</span>
                         <span className="duration">/{plan.duration}天</span>
                       </div>
                     </div>
