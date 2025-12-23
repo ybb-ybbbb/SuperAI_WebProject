@@ -44,8 +44,6 @@ Thumbs.db
 .env.local
 .env.*.local
 
-# Configuration files
-**/etc/*.yaml
 
 # Database and data directories
 default.etcd/

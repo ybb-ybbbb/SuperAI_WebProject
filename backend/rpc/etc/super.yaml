@@ -1,0 +1,14 @@
+Name: super.rpc
+ListenOn: 0.0.0.0:8080
+Etcd:
+  Hosts:
+  - 127.0.0.1:2379
+  Key: super.rpc
+
+# 外部服务配置
+AuthRpc:
+  # 使用Etcd服务发现调用Auth服务
+  Etcd:
+    Hosts:
+    - 127.0.0.1:2379
+    Key: auth.rpc

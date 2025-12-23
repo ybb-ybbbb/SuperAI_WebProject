@@ -1,0 +1,11 @@
+Name: Super
+Host: 0.0.0.0
+Port: 8888
+
+# RPC服务配置
+SuperRpc:
+  # 使用Etcd服务发现连接Super RPC服务
+  Etcd:
+    Hosts:
+    - 127.0.0.1:2379
+    Key: super.rpc
