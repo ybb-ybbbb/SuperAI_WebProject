@@ -28,7 +28,9 @@ func NewServiceContext(c config.Config) *ServiceContext {
 
 	// 初始化外部服务客户端
 	var authClient auth.AuthClient
-	if len(c.AuthRpc.Endpoints) > 0 {
+	// 如果配置了AuthRpc，则初始化AuthClient
+	// 支持两种方式：直接指定Endpoints或使用Etcd服务发现
+	if len(c.AuthRpc.Endpoints) > 0 || len(c.AuthRpc.Etcd.Hosts) > 0 {
 		authConn := zrpc.MustNewClient(c.AuthRpc)
 		authClient = auth.NewAuthClient(authConn.Conn())
 	}
