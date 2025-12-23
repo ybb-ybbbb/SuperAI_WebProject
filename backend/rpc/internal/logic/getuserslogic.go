@@ -3,8 +3,9 @@ package logic
 import (
 	"context"
 
-	"backend/model"
+	"backend/rpc/internal/errorx"
 	"backend/rpc/internal/svc"
+	"backend/rpc/pb/auth"
 	"backend/rpc/pb/rpc"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -23,56 +24,43 @@ func NewGetUsersLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetUsers
 		Logger: logx.WithContext(ctx),
 	}
 }
+
 // 用户相关服务
 func (l *GetUsersLogic) GetUsers(in *rpc.GetUsersReq) (*rpc.GetUsersResp, error) {
-	// 确保page和page_size有默认值
-	page := in.Page
-	if page <= 0 {
-		page = 1
-	}
-	pageSize := in.PageSize
-	if pageSize <= 0 {
-		pageSize = 10
+	// 检查AuthClient是否初始化
+	if l.svcCtx.AuthClient == nil {
+		l.Error("AuthClient未初始化")
+		return nil, errorx.Internal("服务器内部错误")
 	}
 
-	// 计算偏移量
-	offset := (page - 1) * pageSize
-
-	// 查询用户列表
-	var users []model.User
-	var total int64
-
-	// 获取总数
-	l.svcCtx.DB.Model(&model.User{}).Count(&total)
-
-	// 分页查询
-	result := l.svcCtx.DB.Offset(int(offset)).Limit(int(pageSize)).Find(&users)
-	if result.Error != nil {
-		return nil, result.Error
+	// 调用外部AuthService的GetUsers方法
+	authResp, err := l.svcCtx.AuthClient.GetUsers(l.ctx, &auth.GetUsersReq{
+		Page:     in.Page,
+		PageSize: in.PageSize,
+	})
+	if err != nil {
+		l.Error("调用AuthService获取用户列表失败: ", err)
+		return nil, errorx.Internal("服务器内部错误")
 	}
 
-	// 构建响应
-	respUsers := make([]*rpc.User, len(users))
-	for i, user := range users {
-		vipEndAt := ""
-		if user.VipEndAt != nil {
-			vipEndAt = user.VipEndAt.Format("2006-01-02 15:04:05")
-		}
-
+	// 将外部服务的响应转换为主服务的响应格式
+	respUsers := make([]*rpc.User, len(authResp.Users))
+	for i, authUser := range authResp.Users {
 		respUsers[i] = &rpc.User{
-			Id:           string(rune(user.ID)),
-			Username:     user.Username,
-			Email:        user.Email,
-			CreatedAt:    user.CreatedAt.Format("2006-01-02 15:04:05"),
-			UpdatedAt:    user.UpdatedAt.Format("2006-01-02 15:04:05"),
-			IsVip:        user.IsVip,
-			VipExpiresAt: vipEndAt,
-			AutoRenew:    false, // 模型中暂时没有auto_renew字段
+			Id:           authUser.Id,
+			Username:     authUser.Username,
+			Email:        authUser.Email,
+			Avatar:       authUser.Avatar,
+			CreatedAt:    authUser.CreatedAt,
+			UpdatedAt:    authUser.UpdatedAt,
+			IsVip:        authUser.IsVip,
+			VipExpiresAt: authUser.VipExpiresAt,
+			AutoRenew:    authUser.AutoRenew,
 		}
 	}
 
 	return &rpc.GetUsersResp{
 		Users: respUsers,
-		Total: int32(total),
+		Total: authResp.Total,
 	}, nil
 }

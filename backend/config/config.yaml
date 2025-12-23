@@ -11,3 +11,8 @@ database:
   charset: "utf8mb4"
   parseTime: true
   loc: "Local"
+
+# 外部认证服务配置
+auth:
+  host: "127.0.0.1"
+  port: 9090

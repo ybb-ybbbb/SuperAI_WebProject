@@ -65,4 +65,6 @@ coverage/
 *_backup_*
 *.tar.gz
 
+backend/rpc/super_server
+
 

@@ -2,11 +2,10 @@ package logic
 
 import (
 	"context"
-	"strconv"
 
-	"backend/model"
 	"backend/rpc/internal/errorx"
 	"backend/rpc/internal/svc"
+	"backend/rpc/pb/auth"
 	"backend/rpc/pb/rpc"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -27,30 +26,33 @@ func NewGetUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetUserLo
 }
 
 func (l *GetUserLogic) GetUser(in *rpc.GetUserReq) (*rpc.GetUserResp, error) {
-	// 1. 查找用户
-	var user model.User
-	result := l.svcCtx.DB.First(&user, in.UserId)
-	if result.Error != nil {
-		l.Error("查找用户失败: ", result.Error)
+	// 检查AuthClient是否初始化
+	if l.svcCtx.AuthClient == nil {
+		l.Error("AuthClient未初始化")
+		return nil, errorx.Internal("服务器内部错误")
+	}
+
+	// 调用外部AuthService的GetUser方法
+	authResp, err := l.svcCtx.AuthClient.GetUser(l.ctx, &auth.GetUserReq{
+		UserId: in.UserId,
+	})
+	if err != nil {
+		l.Error("调用AuthService获取用户失败: ", err)
 		return nil, errorx.NotFound("用户不存在")
 	}
 
-	// 2. 构建响应
-	vipEndAt := ""
-	if user.VipEndAt != nil {
-		vipEndAt = user.VipEndAt.Format("2006-01-02 15:04:05")
-	}
-
+	// 将外部服务的响应转换为主服务的响应格式
 	return &rpc.GetUserResp{
 		User: &rpc.User{
-			Id:           strconv.Itoa(int(user.ID)),
-			Username:     user.Username,
-			Email:        user.Email,
-			CreatedAt:    user.CreatedAt.Format("2006-01-02 15:04:05"),
-			UpdatedAt:    user.UpdatedAt.Format("2006-01-02 15:04:05"),
-			IsVip:        user.IsVip,
-			VipExpiresAt: vipEndAt,
-			AutoRenew:    false,
+			Id:           authResp.User.Id,
+			Username:     authResp.User.Username,
+			Email:        authResp.User.Email,
+			Avatar:       authResp.User.Avatar,
+			CreatedAt:    authResp.User.CreatedAt,
+			UpdatedAt:    authResp.User.UpdatedAt,
+			IsVip:        authResp.User.IsVip,
+			VipExpiresAt: authResp.User.VipExpiresAt,
+			AutoRenew:    authResp.User.AutoRenew,
 		},
 	}, nil
 }

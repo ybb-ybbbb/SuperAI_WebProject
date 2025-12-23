@@ -8,6 +8,7 @@ import (
 	"backend/model"
 	"backend/rpc/internal/errorx"
 	"backend/rpc/internal/svc"
+	"backend/rpc/pb/auth"
 	"backend/rpc/pb/rpc"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -28,22 +29,72 @@ func NewUpdateUserVipLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Upd
 }
 
 func (l *UpdateUserVipLogic) UpdateUserVip(in *rpc.UpdateUserVipReq) (*rpc.UpdateUserVipResp, error) {
-	// 1. 查找用户
+	// 检查AuthClient是否初始化
+	if l.svcCtx.AuthClient == nil {
+		l.Error("AuthClient未初始化")
+		return nil, errorx.Internal("服务器内部错误")
+	}
+
+	// 1. 调用外部AuthService的UpdateUserVip方法
+	authResp, err := l.svcCtx.AuthClient.UpdateUserVip(l.ctx, &auth.UpdateUserVipReq{
+		UserId:     in.UserId,
+		IsVip:      in.IsVip,
+		VipExpires: in.VipExpires,
+	})
+	if err != nil {
+		l.Error("调用AuthService更新用户VIP状态失败: ", err)
+		return nil, errorx.Internal("更新用户VIP状态失败，请稍后重试")
+	}
+
+	// 2. 同步更新本地数据库中的用户VIP状态
+	// 查找用户
 	var user model.User
-	result := l.svcCtx.DB.First(&user, in.UserId)
-	if result.Error != nil {
-		l.Error("查找用户失败: ", result.Error)
+	userID, err := strconv.ParseUint(in.UserId, 10, 64)
+	if err != nil {
+		l.Error("解析用户ID失败: ", err)
 		return nil, errorx.NotFound("用户不存在")
 	}
 
-	// 2. 更新用户VIP状态
+	result := l.svcCtx.DB.First(&user, userID)
+	if result.Error != nil {
+		l.Error("查找用户失败: ", result.Error)
+		// 外部服务已更新成功，本地同步失败不影响主流程
+		return &rpc.UpdateUserVipResp{
+			User: &rpc.User{
+				Id:           authResp.User.Id,
+				Username:     authResp.User.Username,
+				Email:        authResp.User.Email,
+				Avatar:       authResp.User.Avatar,
+				CreatedAt:    authResp.User.CreatedAt,
+				UpdatedAt:    authResp.User.UpdatedAt,
+				IsVip:        authResp.User.IsVip,
+				VipExpiresAt: authResp.User.VipExpiresAt,
+				AutoRenew:    authResp.User.AutoRenew,
+			},
+		}, nil
+	}
+
+	// 3. 更新本地用户VIP状态和记录
 	if in.IsVip {
 		// 激活VIP，创建VIP记录
 		// 解析VIP过期时间
 		vipExpires, err := time.Parse("2006-01-02 15:04:05", in.VipExpires)
 		if err != nil {
 			l.Error("解析VIP过期时间失败: ", err)
-			return nil, errorx.InvalidArgument("VIP过期时间格式不正确")
+			// 外部服务已更新成功，本地同步失败不影响主流程
+			return &rpc.UpdateUserVipResp{
+				User: &rpc.User{
+					Id:           authResp.User.Id,
+					Username:     authResp.User.Username,
+					Email:        authResp.User.Email,
+					Avatar:       authResp.User.Avatar,
+					CreatedAt:    authResp.User.CreatedAt,
+					UpdatedAt:    authResp.User.UpdatedAt,
+					IsVip:        authResp.User.IsVip,
+					VipExpiresAt: authResp.User.VipExpiresAt,
+					AutoRenew:    authResp.User.AutoRenew,
+				},
+			}, nil
 		}
 
 		// 将用户所有VIP记录设置为非激活
@@ -60,10 +111,7 @@ func (l *UpdateUserVipLogic) UpdateUserVip(in *rpc.UpdateUserVipReq) (*rpc.Updat
 		}
 
 		// 保存VIP记录
-		if err := l.svcCtx.DB.Create(&vipRecord).Error; err != nil {
-			l.Error("创建VIP记录失败: ", err)
-			return nil, errorx.Internal("更新VIP状态失败，请稍后重试")
-		}
+		l.svcCtx.DB.Create(&vipRecord)
 
 		// 更新用户VIP状态
 		user.IsVip = true
@@ -79,28 +127,21 @@ func (l *UpdateUserVipLogic) UpdateUserVip(in *rpc.UpdateUserVipReq) (*rpc.Updat
 		l.svcCtx.DB.Model(&model.VipRecord{}).Where("user_id = ?", user.ID).Update("is_active", false)
 	}
 
-	// 3. 保存用户信息
-	if err := l.svcCtx.DB.Save(&user).Error; err != nil {
-		l.Error("更新用户VIP状态失败: ", err)
-		return nil, errorx.Internal("更新VIP状态失败，请稍后重试")
-	}
+	// 保存用户信息
+	l.svcCtx.DB.Save(&user)
 
-	// 4. 构建响应
-	vipEndAt := ""
-	if user.VipEndAt != nil {
-		vipEndAt = user.VipEndAt.Format("2006-01-02 15:04:05")
-	}
-
+	// 构建响应
 	return &rpc.UpdateUserVipResp{
 		User: &rpc.User{
-			Id:           strconv.Itoa(int(user.ID)),
-			Username:     user.Username,
-			Email:        user.Email,
-			CreatedAt:    user.CreatedAt.Format("2006-01-02 15:04:05"),
-			UpdatedAt:    user.UpdatedAt.Format("2006-01-02 15:04:05"),
-			IsVip:        user.IsVip,
-			VipExpiresAt: vipEndAt,
-			AutoRenew:    false,
+			Id:           authResp.User.Id,
+			Username:     authResp.User.Username,
+			Email:        authResp.User.Email,
+			Avatar:       authResp.User.Avatar,
+			CreatedAt:    authResp.User.CreatedAt,
+			UpdatedAt:    authResp.User.UpdatedAt,
+			IsVip:        authResp.User.IsVip,
+			VipExpiresAt: authResp.User.VipExpiresAt,
+			AutoRenew:    authResp.User.AutoRenew,
 		},
 	}, nil
 }
