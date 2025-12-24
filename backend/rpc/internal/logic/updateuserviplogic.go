@@ -9,7 +9,7 @@ import (
 	"backend/rpc/internal/errorx"
 	"backend/rpc/internal/svc"
 	"backend/rpc/pb/auth"
-	"backend/rpc/pb/rpc"
+	"backend/rpc/pb/super"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -28,7 +28,7 @@ func NewUpdateUserVipLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Upd
 	}
 }
 
-func (l *UpdateUserVipLogic) UpdateUserVip(in *rpc.UpdateUserVipReq) (*rpc.UpdateUserVipResp, error) {
+func (l *UpdateUserVipLogic) UpdateUserVip(in *super.UpdateUserVipReq) (*super.UpdateUserVipResp, error) {
 	// 检查AuthClient是否初始化
 	if l.svcCtx.AuthClient == nil {
 		l.Error("AuthClient未初始化")
@@ -59,8 +59,8 @@ func (l *UpdateUserVipLogic) UpdateUserVip(in *rpc.UpdateUserVipReq) (*rpc.Updat
 	if result.Error != nil {
 		l.Error("查找用户失败: ", result.Error)
 		// 外部服务已更新成功，本地同步失败不影响主流程
-		return &rpc.UpdateUserVipResp{
-			User: &rpc.User{
+		return &super.UpdateUserVipResp{
+			User: &super.User{
 				Id:           authResp.User.Id,
 				Username:     authResp.User.Username,
 				Email:        authResp.User.Email,
@@ -82,8 +82,8 @@ func (l *UpdateUserVipLogic) UpdateUserVip(in *rpc.UpdateUserVipReq) (*rpc.Updat
 		if err != nil {
 			l.Error("解析VIP过期时间失败: ", err)
 			// 外部服务已更新成功，本地同步失败不影响主流程
-			return &rpc.UpdateUserVipResp{
-				User: &rpc.User{
+			return &super.UpdateUserVipResp{
+				User: &super.User{
 					Id:           authResp.User.Id,
 					Username:     authResp.User.Username,
 					Email:        authResp.User.Email,
@@ -131,8 +131,8 @@ func (l *UpdateUserVipLogic) UpdateUserVip(in *rpc.UpdateUserVipReq) (*rpc.Updat
 	l.svcCtx.DB.Save(&user)
 
 	// 构建响应
-	return &rpc.UpdateUserVipResp{
-		User: &rpc.User{
+	return &super.UpdateUserVipResp{
+		User: &super.User{
 			Id:           authResp.User.Id,
 			Username:     authResp.User.Username,
 			Email:        authResp.User.Email,

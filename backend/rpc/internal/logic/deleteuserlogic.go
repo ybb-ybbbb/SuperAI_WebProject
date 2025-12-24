@@ -6,7 +6,7 @@ import (
 	"backend/rpc/internal/errorx"
 	"backend/rpc/internal/svc"
 	"backend/rpc/pb/auth"
-	"backend/rpc/pb/rpc"
+	"backend/rpc/pb/super"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -25,7 +25,7 @@ func NewDeleteUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Delete
 	}
 }
 
-func (l *DeleteUserLogic) DeleteUser(in *rpc.DeleteUserReq) (*rpc.DeleteUserResp, error) {
+func (l *DeleteUserLogic) DeleteUser(in *super.DeleteUserReq) (*super.DeleteUserResp, error) {
 	// 检查AuthClient是否初始化
 	if l.svcCtx.AuthClient == nil {
 		l.Error("AuthClient未初始化")
@@ -42,5 +42,5 @@ func (l *DeleteUserLogic) DeleteUser(in *rpc.DeleteUserReq) (*rpc.DeleteUserResp
 	}
 
 	// 构建响应
-	return &rpc.DeleteUserResp{}, nil
+	return &super.DeleteUserResp{}, nil
 }

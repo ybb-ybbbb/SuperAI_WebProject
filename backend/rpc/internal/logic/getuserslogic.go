@@ -6,7 +6,7 @@ import (
 	"backend/rpc/internal/errorx"
 	"backend/rpc/internal/svc"
 	"backend/rpc/pb/auth"
-	"backend/rpc/pb/rpc"
+	"backend/rpc/pb/super"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -26,7 +26,7 @@ func NewGetUsersLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetUsers
 }
 
 // 用户相关服务
-func (l *GetUsersLogic) GetUsers(in *rpc.GetUsersReq) (*rpc.GetUsersResp, error) {
+func (l *GetUsersLogic) GetUsers(in *super.GetUsersReq) (*super.GetUsersResp, error) {
 	// 检查AuthClient是否初始化
 	if l.svcCtx.AuthClient == nil {
 		l.Error("AuthClient未初始化")
@@ -44,9 +44,9 @@ func (l *GetUsersLogic) GetUsers(in *rpc.GetUsersReq) (*rpc.GetUsersResp, error)
 	}
 
 	// 将外部服务的响应转换为主服务的响应格式
-	respUsers := make([]*rpc.User, len(authResp.Users))
+	respUsers := make([]*super.User, len(authResp.Users))
 	for i, authUser := range authResp.Users {
-		respUsers[i] = &rpc.User{
+		respUsers[i] = &super.User{
 			Id:           authUser.Id,
 			Username:     authUser.Username,
 			Email:        authUser.Email,
@@ -59,7 +59,7 @@ func (l *GetUsersLogic) GetUsers(in *rpc.GetUsersReq) (*rpc.GetUsersResp, error)
 		}
 	}
 
-	return &rpc.GetUsersResp{
+	return &super.GetUsersResp{
 		Users: respUsers,
 		Total: authResp.Total,
 	}, nil

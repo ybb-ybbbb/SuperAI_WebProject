@@ -6,7 +6,7 @@ import (
 	"backend/rpc/internal/errorx"
 	"backend/rpc/internal/svc"
 	"backend/rpc/pb/auth"
-	"backend/rpc/pb/rpc"
+	"backend/rpc/pb/super"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -25,7 +25,7 @@ func NewUpdateUserPasswordLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 	}
 }
 
-func (l *UpdateUserPasswordLogic) UpdateUserPassword(in *rpc.UpdateUserPasswordReq) (*rpc.UpdateUserPasswordResp, error) {
+func (l *UpdateUserPasswordLogic) UpdateUserPassword(in *super.UpdateUserPasswordReq) (*super.UpdateUserPasswordResp, error) {
 	// 检查AuthClient是否初始化
 	if l.svcCtx.AuthClient == nil {
 		l.Error("AuthClient未初始化")
@@ -44,5 +44,5 @@ func (l *UpdateUserPasswordLogic) UpdateUserPassword(in *rpc.UpdateUserPasswordR
 	}
 
 	// 构建响应
-	return &rpc.UpdateUserPasswordResp{}, nil
+	return &super.UpdateUserPasswordResp{}, nil
 }

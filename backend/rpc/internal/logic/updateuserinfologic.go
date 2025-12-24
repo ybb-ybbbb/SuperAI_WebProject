@@ -6,7 +6,7 @@ import (
 	"backend/rpc/internal/errorx"
 	"backend/rpc/internal/svc"
 	"backend/rpc/pb/auth"
-	"backend/rpc/pb/rpc"
+	"backend/rpc/pb/super"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -25,7 +25,7 @@ func NewUpdateUserInfoLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Up
 	}
 }
 
-func (l *UpdateUserInfoLogic) UpdateUserInfo(in *rpc.UpdateUserInfoReq) (*rpc.UpdateUserInfoResp, error) {
+func (l *UpdateUserInfoLogic) UpdateUserInfo(in *super.UpdateUserInfoReq) (*super.UpdateUserInfoResp, error) {
 	// 检查AuthClient是否初始化
 	if l.svcCtx.AuthClient == nil {
 		l.Error("AuthClient未初始化")
@@ -45,8 +45,8 @@ func (l *UpdateUserInfoLogic) UpdateUserInfo(in *rpc.UpdateUserInfoReq) (*rpc.Up
 	}
 
 	// 将外部服务的响应转换为主服务的响应格式
-	return &rpc.UpdateUserInfoResp{
-		User: &rpc.User{
+	return &super.UpdateUserInfoResp{
+		User: &super.User{
 			Id:           authResp.User.Id,
 			Username:     authResp.User.Username,
 			Email:        authResp.User.Email,

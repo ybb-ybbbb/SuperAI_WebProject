@@ -6,7 +6,7 @@ import (
 	"backend/rpc/internal/errorx"
 	"backend/rpc/internal/svc"
 	"backend/rpc/pb/auth"
-	"backend/rpc/pb/rpc"
+	"backend/rpc/pb/super"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -26,7 +26,7 @@ func NewRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Register
 }
 
 // 用户相关服务
-func (l *RegisterLogic) Register(in *rpc.RegisterReq) (*rpc.RegisterResp, error) {
+func (l *RegisterLogic) Register(in *super.RegisterReq) (*super.RegisterResp, error) {
 	// 检查AuthClient是否初始化
 	if l.svcCtx.AuthClient == nil {
 		l.Error("AuthClient未初始化")
@@ -45,8 +45,8 @@ func (l *RegisterLogic) Register(in *rpc.RegisterReq) (*rpc.RegisterResp, error)
 	}
 
 	// 将外部服务的响应转换为主服务的响应格式
-	return &rpc.RegisterResp{
-		User: &rpc.User{
+	return &super.RegisterResp{
+		User: &super.User{
 			Id:           authResp.User.Id,
 			Username:     authResp.User.Username,
 			Email:        authResp.User.Email,
