@@ -8,6 +8,7 @@ import Users from './pages/Users.jsx'
 import Settings from './pages/Settings.jsx'
 import Profile from './pages/Profile.jsx'
 import VIP from './pages/VIP.jsx'
+import AI from './pages/AI.jsx'
 import AuthGuard from './components/AuthGuard.jsx'
 
 createRoot(document.getElementById('root')).render(
@@ -20,6 +21,7 @@ createRoot(document.getElementById('root')).render(
         {/* 受保护路由 */}
         <Route element={<AuthGuard />}>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/ai" element={<AI />} />
           <Route path="/users" element={<Users />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/profile" element={<Profile />} />

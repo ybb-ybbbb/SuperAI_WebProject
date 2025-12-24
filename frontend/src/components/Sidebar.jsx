@@ -12,6 +12,13 @@ const Sidebar = () => {
       isActive: location.pathname === '/dashboard'
     },
     {
+      id: 'ai',
+      name: 'AI功能',
+      path: '/ai',
+      icon: '🤖',
+      isActive: location.pathname === '/ai'
+    },
+    {
       id: 'users',
       name: '用户管理',
       path: '/users',
