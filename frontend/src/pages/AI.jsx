@@ -17,6 +17,14 @@ const AI = () => {
   const [isLoading, setIsLoading] = useState(false);
   const chatEndRef = useRef(null);
 
+  // 内容生成状态
+  const [contentType, setContentType] = useState('通知公告');
+  const [contentTopic, setContentTopic] = useState('');
+  const [contentKeywords, setContentKeywords] = useState('');
+  const [contentLength, setContentLength] = useState(500);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedContent, setGeneratedContent] = useState('这里将显示AI生成的内容...');
+
   // 滚动到底部
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -71,6 +79,63 @@ const AI = () => {
     if (e.key === 'Enter' && !isLoading) {
       handleSendMessage();
     }
+  };
+
+  // 生成内容
+  const handleGenerateContent = async () => {
+    if (!contentTopic.trim() || isGenerating) return;
+
+    setIsGenerating(true);
+    setGeneratedContent('正在生成内容...');
+
+    try {
+      // 构建生成内容的prompt
+      const prompt = `生成一篇${contentLength}字的${contentType}，主题是${contentTopic}${contentKeywords ? `，关键词包括：${contentKeywords}` : ''}。`;
+      
+      // 调用AI API
+      const response = await fetch(`https://api.52vmy.cn/api/chat/spark?msg=${encodeURIComponent(prompt)}`);
+      const data = await response.json();
+      
+      if (data.code === 200) {
+        setGeneratedContent(data.data.answer);
+      } else {
+        setGeneratedContent('生成失败，请稍后重试。');
+      }
+    } catch (error) {
+      console.error('内容生成失败:', error);
+      setGeneratedContent('生成失败，请检查网络连接或稍后重试。');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // 处理内容长度变化
+  const handleLengthChange = (e) => {
+    setContentLength(Number(e.target.value));
+  };
+
+  // 编辑内容
+  const handleEditContent = () => {
+    // 这里可以实现编辑功能，例如将生成的内容放入可编辑状态
+    alert('编辑功能将在后续版本中实现');
+  };
+
+  // 保存内容
+  const handleSaveContent = () => {
+    // 这里可以实现保存功能，例如将生成的内容保存到数据库
+    alert('保存功能将在后续版本中实现');
+  };
+
+  // 复制内容
+  const handleCopyContent = () => {
+    navigator.clipboard.writeText(generatedContent)
+      .then(() => {
+        alert('内容已复制到剪贴板');
+      })
+      .catch(err => {
+        console.error('复制失败:', err);
+        alert('复制失败，请手动复制');
+      });
   };
 
   return (
@@ -154,7 +219,7 @@ const AI = () => {
                       className="form-input-macaron"
                       value={inputValue}
                       onChange={(e) => setInputValue(e.target.value)}
-                      onKeyPress={handleKeyPress}
+                      onKeyDown={handleKeyPress}
                       disabled={isLoading}
                     />
                     <button 
@@ -272,7 +337,11 @@ const AI = () => {
                 <div className="ai-content-container">
                   <div className="form-group">
                     <label>内容类型</label>
-                    <select className="form-input-macaron">
+                    <select 
+                      className="form-input-macaron"
+                      value={contentType}
+                      onChange={(e) => setContentType(e.target.value)}
+                    >
                       <option>通知公告</option>
                       <option>邮件模板</option>
                       <option>文章摘要</option>
@@ -286,6 +355,8 @@ const AI = () => {
                       type="text" 
                       placeholder="输入内容主题..." 
                       className="form-input-macaron"
+                      value={contentTopic}
+                      onChange={(e) => setContentTopic(e.target.value)}
                     />
                   </div>
                   <div className="form-group">
@@ -294,6 +365,8 @@ const AI = () => {
                       type="text" 
                       placeholder="输入关键词，用逗号分隔..." 
                       className="form-input-macaron"
+                      value={contentKeywords}
+                      onChange={(e) => setContentKeywords(e.target.value)}
                     />
                   </div>
                   <div className="form-group">
@@ -302,21 +375,43 @@ const AI = () => {
                       type="range" 
                       min="100" 
                       max="1000" 
-                      defaultValue="500" 
+                      value={contentLength}
+                      onChange={handleLengthChange}
                     />
-                    <span className="range-value">500字</span>
+                    <span className="range-value">{contentLength}字</span>
                   </div>
-                  <button className="submit-button-macaron">生成内容</button>
+                  <button 
+                    className="submit-button-macaron"
+                    onClick={handleGenerateContent}
+                    disabled={isGenerating}
+                  >
+                    {isGenerating ? '生成中...' : '生成内容'}
+                  </button>
                   
                   <div className="ai-generated-content">
                     <h3>生成结果</h3>
                     <div className="generated-text">
-                      <p>这里将显示AI生成的内容...</p>
+                      <p>{generatedContent}</p>
                     </div>
                     <div className="content-actions">
-                      <button className="edit-button">编辑</button>
-                      <button className="save-button">保存</button>
-                      <button className="copy-button">复制</button>
+                      <button 
+                        className="edit-button"
+                        onClick={handleEditContent}
+                      >
+                        编辑
+                      </button>
+                      <button 
+                        className="save-button"
+                        onClick={handleSaveContent}
+                      >
+                        保存
+                      </button>
+                      <button 
+                        className="copy-button"
+                        onClick={handleCopyContent}
+                      >
+                        复制
+                      </button>
                     </div>
                   </div>
                 </div>
