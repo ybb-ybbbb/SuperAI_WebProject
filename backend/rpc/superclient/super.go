@@ -14,6 +14,7 @@ import (
 )
 
 type (
+	AIUsageData                = super.AIUsageData
 	CheckUserVipReq            = super.CheckUserVipReq
 	CheckUserVipResp           = super.CheckUserVipResp
 	CreateVipOrderReq          = super.CreateVipOrderReq
@@ -22,6 +23,8 @@ type (
 	CreateVipPlanResp          = super.CreateVipPlanResp
 	DeleteUserReq              = super.DeleteUserReq
 	DeleteUserResp             = super.DeleteUserResp
+	GetAIUsageReq              = super.GetAIUsageReq
+	GetAIUsageResp             = super.GetAIUsageResp
 	GetUserActiveVipRecordReq  = super.GetUserActiveVipRecordReq
 	GetUserActiveVipRecordResp = super.GetUserActiveVipRecordResp
 	GetUserCountReq            = super.GetUserCountReq
@@ -48,6 +51,8 @@ type (
 	RegisterResp               = super.RegisterResp
 	SyncUserVipStatusReq       = super.SyncUserVipStatusReq
 	SyncUserVipStatusResp      = super.SyncUserVipStatusResp
+	UpdateAIUsageReq           = super.UpdateAIUsageReq
+	UpdateAIUsageResp          = super.UpdateAIUsageResp
 	UpdateAutoRenewReq         = super.UpdateAutoRenewReq
 	UpdateAutoRenewResp        = super.UpdateAutoRenewResp
 	UpdateUserInfoReq          = super.UpdateUserInfoReq
@@ -88,6 +93,9 @@ type (
 		CheckUserVip(ctx context.Context, in *CheckUserVipReq, opts ...grpc.CallOption) (*CheckUserVipResp, error)
 		UpdateAutoRenew(ctx context.Context, in *UpdateAutoRenewReq, opts ...grpc.CallOption) (*UpdateAutoRenewResp, error)
 		SyncUserVipStatus(ctx context.Context, in *SyncUserVipStatusReq, opts ...grpc.CallOption) (*SyncUserVipStatusResp, error)
+		// AI使用量相关服务
+		GetAIUsage(ctx context.Context, in *GetAIUsageReq, opts ...grpc.CallOption) (*GetAIUsageResp, error)
+		UpdateAIUsage(ctx context.Context, in *UpdateAIUsageReq, opts ...grpc.CallOption) (*UpdateAIUsageResp, error)
 	}
 
 	defaultSuper struct {
@@ -209,4 +217,15 @@ func (m *defaultSuper) UpdateAutoRenew(ctx context.Context, in *UpdateAutoRenewR
 func (m *defaultSuper) SyncUserVipStatus(ctx context.Context, in *SyncUserVipStatusReq, opts ...grpc.CallOption) (*SyncUserVipStatusResp, error) {
 	client := super.NewSuperClient(m.cli.Conn())
 	return client.SyncUserVipStatus(ctx, in, opts...)
+}
+
+// AI使用量相关服务
+func (m *defaultSuper) GetAIUsage(ctx context.Context, in *GetAIUsageReq, opts ...grpc.CallOption) (*GetAIUsageResp, error) {
+	client := super.NewSuperClient(m.cli.Conn())
+	return client.GetAIUsage(ctx, in, opts...)
+}
+
+func (m *defaultSuper) UpdateAIUsage(ctx context.Context, in *UpdateAIUsageReq, opts ...grpc.CallOption) (*UpdateAIUsageResp, error) {
+	client := super.NewSuperClient(m.cli.Conn())
+	return client.UpdateAIUsage(ctx, in, opts...)
 }

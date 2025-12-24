@@ -6,6 +6,7 @@ package handler
 import (
 	"net/http"
 
+	ai "backend/api/internal/handler/ai"
 	user "backend/api/internal/handler/user"
 	vip "backend/api/internal/handler/vip"
 	"backend/api/internal/svc"
@@ -16,6 +17,31 @@ import (
 func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
 		[]rest.Route{
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/ai/request",
+				Handler: ai.AiRequestHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/ai/usage",
+				Handler: ai.GetAIUsageHandler(serverCtx),
+			},
+		},
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/ai/usage/:user_id",
+				Handler: user.GetAIUsageHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/ai/usage/:user_id",
+				Handler: user.UpdateAIUsageHandler(serverCtx),
+			},
 			{
 				Method:  http.MethodGet,
 				Path:    "/api/user/:user_id",

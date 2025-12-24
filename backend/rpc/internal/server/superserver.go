@@ -132,3 +132,14 @@ func (s *SuperServer) SyncUserVipStatus(ctx context.Context, in *super.SyncUserV
 	l := logic.NewSyncUserVipStatusLogic(ctx, s.svcCtx)
 	return l.SyncUserVipStatus(in)
 }
+
+// AI使用量相关服务
+func (s *SuperServer) GetAIUsage(ctx context.Context, in *super.GetAIUsageReq) (*super.GetAIUsageResp, error) {
+	l := logic.NewGetAIUsageLogic(ctx, s.svcCtx)
+	return l.GetAIUsage(in)
+}
+
+func (s *SuperServer) UpdateAIUsage(ctx context.Context, in *super.UpdateAIUsageReq) (*super.UpdateAIUsageResp, error) {
+	l := logic.NewUpdateAIUsageLogic(ctx, s.svcCtx)
+	return l.UpdateAIUsage(in)
+}

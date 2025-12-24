@@ -286,6 +286,47 @@ type SyncUserVipStatusResp {
 	Data SyncUserVipStatusData `json:"data"`
 }
 
+// AI使用次数相关类型
+type AIUsageData {
+	IsVip           bool   `json:"is_vip"`
+	AIChatCount     int    `json:"ai_chat_count"`
+	AIChatLimit     int    `json:"ai_chat_limit"`
+	AIContentCount  int    `json:"ai_content_count"`
+	AIContentLimit  int    `json:"ai_content_limit"`
+	AIAnalysisCount int    `json:"ai_analysis_count"`
+	AIAnalysisLimit int    `json:"ai_analysis_limit"`
+	AILastResetAt   string `json:"ai_last_reset_at"`
+}
+
+type UpdateAIUsageReq {
+	UserId    string `path:"user_id"`
+	UsageType string `json:"usage_type"` // chat, content, analysis
+}
+
+type GetAIUsageResp {
+	BaseResp
+	Data AIUsageData `json:"data"`
+}
+
+type UpdateAIUsageResp {
+	BaseResp
+	Data AIUsageData `json:"data"`
+}
+
+type AIRequestReq {
+	Prompt string `json:"prompt"`
+}
+
+type AIResponseData {
+	Response string      `json:"response"`
+	Usage    AIUsageData `json:"usage"`
+}
+
+type AIRequestResp {
+	BaseResp
+	Data AIResponseData `json:"data"`
+}
+
 // 用户相关API服务
 @server (
 	group: user
@@ -345,6 +386,13 @@ service Super {
 
 	@handler getUserActiveVipRecord
 	get /api/user/:user_id/vip/active (GetUserActiveVipRecordReq) returns (GetUserActiveVipRecordResp)
+
+	// AI使用次数相关API
+	@handler getAIUsage
+	get /api/ai/usage/:user_id (GetUserInfoReq) returns (GetAIUsageResp)
+
+	@handler updateAIUsage
+	post /api/ai/usage/:user_id (UpdateAIUsageReq) returns (UpdateAIUsageResp)
 }
 
 // VIP相关API服务
@@ -360,5 +408,17 @@ service Super {
 
 	@handler createVipPlan
 	post /api/vip/plans (CreateVipPlanReq) returns (CreateVipPlanResp)
+}
+
+// AI相关API服务
+@server (
+	group: ai
+)
+service Super {
+	@handler getAIUsage
+	get /api/ai/usage (EmptyReq) returns (GetAIUsageResp)
+
+	@handler aiRequest
+	post /api/ai/request (AIRequestReq) returns (AIRequestResp)
 }
 

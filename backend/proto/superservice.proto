@@ -265,6 +265,35 @@ message SyncUserVipStatusResp {
   string expires_at = 2;
 }
 
+// AI使用量相关消息
+message AIUsageData {
+  bool is_vip = 1;
+  int32 ai_chat_count = 2;
+  int32 ai_chat_limit = 3;
+  int32 ai_content_count = 4;
+  int32 ai_content_limit = 5;
+  int32 ai_analysis_count = 6;
+  int32 ai_analysis_limit = 7;
+  string ai_last_reset_at = 8;
+}
+
+message GetAIUsageReq {
+  string user_id = 1;
+}
+
+message GetAIUsageResp {
+  AIUsageData usage = 1;
+}
+
+message UpdateAIUsageReq {
+  string user_id = 1;
+  string usage_type = 2; // chat, content, analysis
+}
+
+message UpdateAIUsageResp {
+  AIUsageData usage = 1;
+}
+
 // 服务定义
 service Super {
   // 用户相关服务
@@ -297,4 +326,8 @@ service Super {
   rpc CheckUserVip(CheckUserVipReq) returns (CheckUserVipResp);
   rpc UpdateAutoRenew(UpdateAutoRenewReq) returns (UpdateAutoRenewResp);
   rpc SyncUserVipStatus(SyncUserVipStatusReq) returns (SyncUserVipStatusResp);
+
+  // AI使用量相关服务
+  rpc GetAIUsage(GetAIUsageReq) returns (GetAIUsageResp);
+  rpc UpdateAIUsage(UpdateAIUsageReq) returns (UpdateAIUsageResp);
 }

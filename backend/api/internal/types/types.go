@@ -3,6 +3,31 @@
 
 package types
 
+type AIRequestReq struct {
+	Prompt string `json:"prompt"`
+}
+
+type AIRequestResp struct {
+	BaseResp
+	Data AIResponseData `json:"data"`
+}
+
+type AIResponseData struct {
+	Response string      `json:"response"`
+	Usage    AIUsageData `json:"usage"`
+}
+
+type AIUsageData struct {
+	IsVip           bool   `json:"is_vip"`
+	AIChatCount     int    `json:"ai_chat_count"`
+	AIChatLimit     int    `json:"ai_chat_limit"`
+	AIContentCount  int    `json:"ai_content_count"`
+	AIContentLimit  int    `json:"ai_content_limit"`
+	AIAnalysisCount int    `json:"ai_analysis_count"`
+	AIAnalysisLimit int    `json:"ai_analysis_limit"`
+	AILastResetAt   string `json:"ai_last_reset_at"`
+}
+
 type BaseResp struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
@@ -52,6 +77,11 @@ type EmptyReq struct {
 }
 
 type EmptyResp struct {
+}
+
+type GetAIUsageResp struct {
+	BaseResp
+	Data AIUsageData `json:"data"`
 }
 
 type GetUserActiveVipRecordReq struct {
@@ -179,6 +209,16 @@ type SyncUserVipStatusReq struct {
 type SyncUserVipStatusResp struct {
 	BaseResp
 	Data SyncUserVipStatusData `json:"data"`
+}
+
+type UpdateAIUsageReq struct {
+	UserId    string `path:"user_id"`
+	UsageType string `json:"usage_type"` // chat, content, analysis
+}
+
+type UpdateAIUsageResp struct {
+	BaseResp
+	Data AIUsageData `json:"data"`
 }
 
 type UpdateAutoRenewReq struct {

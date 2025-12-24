@@ -40,6 +40,8 @@ const (
 	Super_CheckUserVip_FullMethodName           = "/superservice.Super/CheckUserVip"
 	Super_UpdateAutoRenew_FullMethodName        = "/superservice.Super/UpdateAutoRenew"
 	Super_SyncUserVipStatus_FullMethodName      = "/superservice.Super/SyncUserVipStatus"
+	Super_GetAIUsage_FullMethodName             = "/superservice.Super/GetAIUsage"
+	Super_UpdateAIUsage_FullMethodName          = "/superservice.Super/UpdateAIUsage"
 )
 
 // SuperClient is the client API for Super service.
@@ -72,6 +74,9 @@ type SuperClient interface {
 	CheckUserVip(ctx context.Context, in *CheckUserVipReq, opts ...grpc.CallOption) (*CheckUserVipResp, error)
 	UpdateAutoRenew(ctx context.Context, in *UpdateAutoRenewReq, opts ...grpc.CallOption) (*UpdateAutoRenewResp, error)
 	SyncUserVipStatus(ctx context.Context, in *SyncUserVipStatusReq, opts ...grpc.CallOption) (*SyncUserVipStatusResp, error)
+	// AI使用量相关服务
+	GetAIUsage(ctx context.Context, in *GetAIUsageReq, opts ...grpc.CallOption) (*GetAIUsageResp, error)
+	UpdateAIUsage(ctx context.Context, in *UpdateAIUsageReq, opts ...grpc.CallOption) (*UpdateAIUsageResp, error)
 }
 
 type superClient struct {
@@ -271,6 +276,24 @@ func (c *superClient) SyncUserVipStatus(ctx context.Context, in *SyncUserVipStat
 	return out, nil
 }
 
+func (c *superClient) GetAIUsage(ctx context.Context, in *GetAIUsageReq, opts ...grpc.CallOption) (*GetAIUsageResp, error) {
+	out := new(GetAIUsageResp)
+	err := c.cc.Invoke(ctx, Super_GetAIUsage_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *superClient) UpdateAIUsage(ctx context.Context, in *UpdateAIUsageReq, opts ...grpc.CallOption) (*UpdateAIUsageResp, error) {
+	out := new(UpdateAIUsageResp)
+	err := c.cc.Invoke(ctx, Super_UpdateAIUsage_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SuperServer is the server API for Super service.
 // All implementations must embed UnimplementedSuperServer
 // for forward compatibility
@@ -301,6 +324,9 @@ type SuperServer interface {
 	CheckUserVip(context.Context, *CheckUserVipReq) (*CheckUserVipResp, error)
 	UpdateAutoRenew(context.Context, *UpdateAutoRenewReq) (*UpdateAutoRenewResp, error)
 	SyncUserVipStatus(context.Context, *SyncUserVipStatusReq) (*SyncUserVipStatusResp, error)
+	// AI使用量相关服务
+	GetAIUsage(context.Context, *GetAIUsageReq) (*GetAIUsageResp, error)
+	UpdateAIUsage(context.Context, *UpdateAIUsageReq) (*UpdateAIUsageResp, error)
 	mustEmbedUnimplementedSuperServer()
 }
 
@@ -370,6 +396,12 @@ func (UnimplementedSuperServer) UpdateAutoRenew(context.Context, *UpdateAutoRene
 }
 func (UnimplementedSuperServer) SyncUserVipStatus(context.Context, *SyncUserVipStatusReq) (*SyncUserVipStatusResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SyncUserVipStatus not implemented")
+}
+func (UnimplementedSuperServer) GetAIUsage(context.Context, *GetAIUsageReq) (*GetAIUsageResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAIUsage not implemented")
+}
+func (UnimplementedSuperServer) UpdateAIUsage(context.Context, *UpdateAIUsageReq) (*UpdateAIUsageResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateAIUsage not implemented")
 }
 func (UnimplementedSuperServer) mustEmbedUnimplementedSuperServer() {}
 
@@ -762,6 +794,42 @@ func _Super_SyncUserVipStatus_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Super_GetAIUsage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAIUsageReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SuperServer).GetAIUsage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Super_GetAIUsage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SuperServer).GetAIUsage(ctx, req.(*GetAIUsageReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Super_UpdateAIUsage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateAIUsageReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SuperServer).UpdateAIUsage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Super_UpdateAIUsage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SuperServer).UpdateAIUsage(ctx, req.(*UpdateAIUsageReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Super_ServiceDesc is the grpc.ServiceDesc for Super service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -852,6 +920,14 @@ var Super_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SyncUserVipStatus",
 			Handler:    _Super_SyncUserVipStatus_Handler,
+		},
+		{
+			MethodName: "GetAIUsage",
+			Handler:    _Super_GetAIUsage_Handler,
+		},
+		{
+			MethodName: "UpdateAIUsage",
+			Handler:    _Super_UpdateAIUsage_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
