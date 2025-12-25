@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 
-const Sidebar = () => {
+const Sidebar = ({ isCollapsed, onToggle }) => {
   const location = useLocation();
 
   const navItems = [
@@ -62,12 +62,19 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="sidebar">
+    <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
       <div className="sidebar-header">
         <h2 className="sidebar-logo">
           <span className="logo-icon">🚀</span>
-          <span className="logo-text">管理中心</span>
+          {!isCollapsed && <span className="logo-text">管理中心</span>}
         </h2>
+        <button 
+          className="sidebar-toggle-btn"
+          onClick={onToggle}
+          aria-label={isCollapsed ? '展开侧边栏' : '折叠侧边栏'}
+        >
+          {isCollapsed ? '▶' : '◀'}
+        </button>
       </div>
       <nav className="sidebar-nav">
         {navItems.map((item) => (
@@ -83,13 +90,13 @@ const Sidebar = () => {
             }}
           >
             <span className="nav-item-icon">{item.icon}</span>
-            <span className="nav-item-text">{item.name}</span>
+            {!isCollapsed && <span className="nav-item-text">{item.name}</span>}
           </Link>
         ))}
       </nav>
       <div className="sidebar-footer">
         <div className="sidebar-version">
-          <span className="version-label">版本</span>
+          {!isCollapsed && <span className="version-label">版本</span>}
           <span className="version-number">v1.0.0</span>
         </div>
       </div>

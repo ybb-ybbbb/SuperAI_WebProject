@@ -143,8 +143,6 @@ const AI = () => {
   // AI使用次数状态
   const [aiUsage, setAIUsage] = useState(null);
   const [isVip, setIsVip] = useState(false);
-  const [user, setUser] = useState(null);
-  const [isCheckingLimit, setIsCheckingLimit] = useState(false);
 
   // 获取用户信息和AI使用情况
   useEffect(() => {
@@ -153,7 +151,6 @@ const AI = () => {
       const storedUser = localStorage.getItem('user');
       if (storedUser) {
         const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
         setIsVip(parsedUser.is_vip || false);
       }
 

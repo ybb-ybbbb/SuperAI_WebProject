@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { FaCrown } from 'react-icons/fa';
+import Breadcrumb from './Breadcrumb';
+import { useTheme } from '../hooks/useTheme';
 
 const TopBar = () => {
+  const { theme, toggleTheme } = useTheme();
   const [user, _setUser] = useState(() => {
     try {
       const storedUser = localStorage.getItem('user');
@@ -17,6 +20,7 @@ const TopBar = () => {
 
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const notifications = [
     {
@@ -37,13 +41,44 @@ const TopBar = () => {
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
+  const handleSearch = (e) => {
+    e.preventDefault();
+    // 实现搜索逻辑
+    console.log('搜索:', searchQuery);
+  };
+
   return (
     <div className="topbar">
       <div className="topbar-left">
-        <h1 className="page-title">仪表盘</h1>
+        <Breadcrumb />
       </div>
       <div className="topbar-right">
+        <div className="search-container">
+          <form onSubmit={handleSearch} className="search-form">
+            <input
+              type="text"
+              placeholder="搜索..."
+              className="search-input"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <button type="submit" className="search-button">
+              🔍
+            </button>
+          </form>
+        </div>
         <div className="topbar-icons">
+          {/* 主题切换按钮 */}
+          <button
+            className="topbar-icon-button"
+            onClick={toggleTheme}
+            aria-label={theme === 'light' ? '切换到深色模式' : '切换到浅色模式'}
+          >
+            <span className="icon">
+              {theme === 'light' ? '🌙' : '☀️'}
+            </span>
+          </button>
+          
           <div className="notification-container">
             <button 
               className="topbar-icon-button"

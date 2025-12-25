@@ -72,7 +72,7 @@ const VIP = () => {
   const [activeTab, setActiveTab] = useState('status');
 
   // 获取最新用户信息
-  const fetchUserInfo = async () => {
+  const fetchUserInfo = useCallback(async () => {
     try {
       if (!user || !user.id) return;
       const userData = await getUserInfo(user.id);
@@ -86,7 +86,7 @@ const VIP = () => {
     } catch (error) {
       console.error('获取用户信息失败:', error);
     }
-  };
+  }, [user]);
 
   // 处理自动续期开关变化
   const handleAutoRenewChange = async (e) => {
@@ -136,7 +136,7 @@ const VIP = () => {
   }, [user]);
 
   // 获取VIP套餐列表
-  const fetchPlans = async () => {
+  const fetchPlans = useCallback(async () => {
     try {
       const plansData = await getVipPlans();
       console.log('获取到的VIP套餐数据:', plansData);
@@ -152,13 +152,13 @@ const VIP = () => {
     } catch (error) {
       console.error('获取VIP套餐列表失败:', error);
     }
-  };
+  }, []);
 
   // 组件加载时获取最新用户信息和套餐列表
   useEffect(() => {
     fetchUserInfo();
     fetchPlans();
-  }, []);
+  }, [fetchUserInfo, fetchPlans]);
 
   // 标签页切换时获取对应数据
   useEffect(() => {
