@@ -60,7 +60,19 @@ const fetchAIUsage = async () => {
     }
     
     const response = await request(`/api/ai/usage/${userId}`);
-    return response.data;
+    const apiData = response.data;
+    
+    // 映射API返回字段到前端期望的字段名
+    return {
+      chat: apiData.ai_chat_count || 0,
+      generate_content: apiData.ai_content_count || 0,
+      analysis: apiData.ai_analysis_count || 0,
+      resetAt: apiData.ai_last_reset_at || new Date().toISOString(), // 映射ai_last_reset_at到resetAt
+      chatLimit: getAILimits(apiData.is_vip || false).chat,
+      contentLimit: getAILimits(apiData.is_vip || false).generate_content,
+      analysisLimit: getAILimits(apiData.is_vip || false).analysis,
+      isVip: apiData.is_vip || false
+    };
   } catch (error) {
     console.error('获取AI使用情况失败:', error);
     // 失败时使用模拟数据
