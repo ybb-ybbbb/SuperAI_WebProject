@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { FaCrown, FaStar } from 'react-icons/fa';
-import Sidebar from '../components/Sidebar';
-import TopBar from '../components/TopBar';
+import { Typography } from 'antd';
 import { getVipOrders, getVipHistory, createVipOrder, getVipPlans, getUserInfo, updateAutoRenew } from '../utils/api';
+
+const { Title, Paragraph } = Typography;
 
 const VIP = () => {
   const [user, setUser] = useState(() => {
@@ -195,33 +196,21 @@ const VIP = () => {
 
   if (!user) {
     return (
-      <div className="dashboard-container">
-        <Sidebar />
-        <div className="main-content">
-          <TopBar />
-          <div className="content-area">
-            <div className="loading-container">
-              <div className="loading-spinner">🔄</div>
-              <p>加载中...</p>
-            </div>
-          </div>
-        </div>
+      <div className="loading-container">
+        <div className="loading-spinner">🔄</div>
+        <p>加载中...</p>
       </div>
     );
   }
 
   return (
-    <div className="dashboard-container">
-      <Sidebar />
-      <div className="main-content">
-        <TopBar />
-        <div className="content-area">
-          <div className="page-header">
-            <h1 className="page-title">VIP会员中心</h1>
-            <p className="page-description">升级VIP会员，享受更多专属权益</p>
-          </div>
-          
-          {/* 标签页导航 */}
+    <div className="vip-page-container">
+      <div style={{ marginBottom: 24 }}>
+        <Title level={2} style={{ marginTop: 0 }}>VIP会员中心</Title>
+        <Paragraph type="secondary">升级VIP会员，享受更多专属权益</Paragraph>
+      </div>
+      
+      {/* 标签页导航 */}
           <div className="vip-tabs">
             <button 
               className={`tab-button ${activeTab === 'status' ? 'active' : ''}`}
@@ -449,8 +438,6 @@ const VIP = () => {
               </div>
             </div>
           )}
-        </div>
-      </div>
     </div>
   );
 };

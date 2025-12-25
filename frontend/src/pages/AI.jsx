@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import Sidebar from '../components/Sidebar';
-import TopBar from '../components/TopBar';
+import { Card, Typography, Tabs } from 'antd';
 import './AI.css';
+
+const { Title, Paragraph } = Typography;
 
 // API请求函数
 const request = async (url, options = {}) => {
@@ -340,17 +341,13 @@ const AI = () => {
   };
 
   return (
-    <div className="dashboard-container">
-      <Sidebar />
-      <div className="main-content">
-        <TopBar />
-        <div className="content-area">
-          <div className="page-header">
-            <h1 className="page-title">AI功能中心</h1>
-            <p className="page-description">智能助手、数据分析和内容生成</p>
-          </div>
+    <div className="ai-page-container">
+      <div style={{ marginBottom: 24 }}>
+        <Title level={2} style={{ marginTop: 0 }}>AI功能中心</Title>
+        <Paragraph type="secondary">智能助手、数据分析和内容生成</Paragraph>
+      </div>
 
-          {/* AI使用次数显示 */}
+      {/* AI使用次数显示 */}
           {aiUsage && (
             <div className="ai-usage-stats">
               <div className="usage-header">
@@ -783,8 +780,6 @@ const AI = () => {
               </div>
             </div>
           )}
-        </div>
-      </div>
     </div>
   );
 };

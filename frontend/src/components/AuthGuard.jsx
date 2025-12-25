@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
+import MainLayout from './MainLayout';
 
 const AuthGuard = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -31,7 +32,11 @@ const AuthGuard = () => {
     );
   }
 
-  return isAuthenticated ? <Outlet /> : <Navigate to="/" replace />;
+  return isAuthenticated ? (
+    <MainLayout>
+      <Outlet />
+    </MainLayout>
+  ) : <Navigate to="/" replace />;
 };
 
 export default AuthGuard;

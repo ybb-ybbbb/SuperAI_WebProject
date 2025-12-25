@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import Sidebar from '../components/Sidebar';
-import TopBar from '../components/TopBar';
+import { Typography, Card } from 'antd';
+
+const { Title, Paragraph } = Typography;
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('system');
@@ -59,17 +60,13 @@ const Settings = () => {
   ];
 
   return (
-    <div className="dashboard-container">
-      <Sidebar />
-      <div className="main-content">
-        <TopBar />
-        <div className="content-area">
-          <div className="page-header">
-            <h1 className="page-title">设置</h1>
-            <p className="page-description">管理系统设置，包括系统配置、安全设置和通知设置</p>
-          </div>
-          
-          <div className="settings-container">
+    <div className="settings-page-container">
+      <div style={{ marginBottom: 24 }}>
+        <Title level={2} style={{ marginTop: 0 }}>设置</Title>
+        <Paragraph type="secondary">管理系统设置，包括系统配置、安全设置和通知设置</Paragraph>
+      </div>
+      
+      <div className="settings-container">
             {/* 设置标签页 */}
             <div className="settings-tabs">
               {tabs.map(tab => (
@@ -302,8 +299,6 @@ const Settings = () => {
                 </button>
               </div>
             </div>
-          </div>
-        </div>
       </div>
     </div>
   );

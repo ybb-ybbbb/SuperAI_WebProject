@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { FaCrown, FaStar } from 'react-icons/fa';
-import Sidebar from '../components/Sidebar';
-import TopBar from '../components/TopBar';
+import { Typography } from 'antd';
+
+const { Title, Paragraph } = Typography;
 
 const Profile = () => {
   const [user, setUser] = useState(() => {
@@ -181,33 +182,21 @@ const Profile = () => {
   
   if (!user) {
     return (
-      <div className="dashboard-container">
-        <Sidebar />
-        <div className="main-content">
-          <TopBar />
-          <div className="content-area">
-            <div className="loading-container">
-              <div className="loading-spinner">🔄</div>
-              <p>加载中...</p>
-            </div>
-          </div>
-        </div>
+      <div className="loading-container">
+        <div className="loading-spinner">🔄</div>
+        <p>加载中...</p>
       </div>
     );
   }
   
   return (
-    <div className="dashboard-container">
-      <Sidebar />
-      <div className="main-content">
-        <TopBar />
-        <div className="content-area">
-          <div className="page-header">
-            <h1 className="page-title">个人资料</h1>
-            <p className="page-description">管理您的个人信息和账户设置</p>
-          </div>
-          
-          <div className="profile-container">
+    <div className="profile-page-container">
+      <div style={{ marginBottom: 24 }}>
+        <Title level={2} style={{ marginTop: 0 }}>个人资料</Title>
+        <Paragraph type="secondary">管理您的个人信息和账户设置</Paragraph>
+      </div>
+      
+      <div className="profile-container">
             {/* 个人资料概览 */}
             <div className="profile-overview">
               <div className="profile-avatar">
@@ -493,8 +482,6 @@ const Profile = () => {
                 </div>
               )}
             </div>
-          </div>
-        </div>
       </div>
     </div>
   );
