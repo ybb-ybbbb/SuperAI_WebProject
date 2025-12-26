@@ -9,9 +9,11 @@ require (
 	golang.org/x/crypto v0.46.0
 	google.golang.org/grpc v1.77.0
 	google.golang.org/protobuf v1.36.11
-	gorm.io/driver/mysql v1.6.0
+	gorm.io/driver/mysql v1.6.0 // indirect
 	gorm.io/gorm v1.31.1
 )
+
+require github.com/xuxinzhi007/dbconnector v1.0.0
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
@@ -109,3 +111,6 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.1 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
+
+// 使用本地 dbconnector
+replace github.com/xuxinzhi007/dbconnector => ../../dbconnector

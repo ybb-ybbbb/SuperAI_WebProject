@@ -1,19 +1,15 @@
 package utils
 
 import (
-	"fmt"
-	"log"
-	"time"
-
 	"backend/model"
+	"fmt"
 
 	"github.com/spf13/viper"
-	"gorm.io/driver/mysql"
+	"github.com/xuxinzhi007/dbconnector"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
-// DB 全局数据库实例
+// DB 全局数据库实例（兼容旧代码）
 var DB *gorm.DB
 
 // InitConfig 初始化配置
@@ -36,79 +32,38 @@ func InitConfig() error {
 	return nil
 }
 
-// InitDB 初始化数据库连接
+// InitDB 初始化数据库连接（兼容旧代码）
 func InitDB() error {
-	// 配置gorm日志
-	gormConfig := &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
-	}
-
-	// 构建MySQL连接DSN
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=%t&loc=%s",
-		viper.GetString("database.user"),
-		viper.GetString("database.password"),
-		viper.GetString("database.host"),
-		viper.GetInt("database.port"),
-		viper.GetString("database.dbname"),
-		viper.GetString("database.charset"),
-		viper.GetBool("database.parseTime"),
-		viper.GetString("database.loc"),
-	)
-
-	// 连接MySQL数据库
-	var err error
-	DB, err = gorm.Open(mysql.Open(dsn), gormConfig)
-	if err != nil {
-		return fmt.Errorf("连接MySQL数据库失败: %v", err)
-	}
-
-	// 配置连接池
-	sqlDB, err := DB.DB()
-	if err != nil {
-		return fmt.Errorf("获取底层sql.DB失败: %v", err)
-	}
-
-	// 设置最大空闲连接数
-	sqlDB.SetMaxIdleConns(10)
-	// 设置最大打开连接数
-	sqlDB.SetMaxOpenConns(100)
-	// 设置连接最大生命周期
-	sqlDB.SetConnMaxLifetime(1 * time.Hour)
-
-	// 自动迁移数据库表
-	if err := autoMigrate(); err != nil {
-		return fmt.Errorf("自动迁移数据库表失败: %v", err)
-	}
-
-	log.Println("数据库连接成功")
-	return nil
-}
-
-// autoMigrate 自动迁移数据库表
-func autoMigrate() error {
-	return DB.AutoMigrate(
+	// 注册所有模型
+	dbconnector.RegisterModels(
 		&model.User{},
 		&model.VipPlan{},
 		&model.VipOrder{},
 		&model.VipRecord{},
+		&model.AIUsage{},
 	)
+
+	// 直接使用 viper 配置初始化数据库
+	// dbconnector.InitDBWithViper() 会从 viper 中读取配置
+	if err := dbconnector.InitDBWithViper(); err != nil {
+		return fmt.Errorf("初始化数据库失败: %v", err)
+	}
+
+	// 更新全局DB实例，兼容旧代码
+	DB = dbconnector.GetDB()
+
+	return nil
 }
 
-// GetDB 获取数据库实例，并确保连接有效
+// GetDB 获取数据库实例（兼容旧代码）
 func GetDB() *gorm.DB {
-	// 检查连接是否有效
-	sqlDB, err := DB.DB()
-	if err != nil {
-		// 如果获取底层sql.DB失败，尝试重新初始化
-		InitDB()
-		return DB
+	// 如果全局DB实例为空，尝试初始化
+	if DB == nil {
+		if err := InitDB(); err != nil {
+			return nil
+		}
 	}
 
-	// 使用Ping检查连接是否活跃
-	if err := sqlDB.Ping(); err != nil {
-		// 如果连接无效，重新初始化
-		InitDB()
-	}
-
-	return DB
+	// 使用dbconnector获取DB实例
+	return dbconnector.GetDB()
 }
