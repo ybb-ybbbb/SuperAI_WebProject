@@ -10,7 +10,9 @@ import {
   UserOutlined,
   CrownOutlined,
   LogoutOutlined,
-  BellOutlined
+  BellOutlined,
+  MessageOutlined,
+  PlusOutlined
 } from '@ant-design/icons';
 import { useNavigate, useLocation, Outlet, Link } from 'react-router-dom';
 
@@ -23,6 +25,10 @@ const breadcrumbNameMap = {
   '/profile': '个人资料',
   '/vip': 'VIP会员',
   '/ai': 'AI功能',
+  '/ollama': 'Ollama管理',
+  '/ollama/chat': 'Ollama聊天',
+  '/ollama/create': '创建模型',
+  '/ollama/settings': 'Ollama设置',
 };
 
 const MainLayout = () => {
@@ -50,6 +56,12 @@ const MainLayout = () => {
   const menuItems = [
     { key: '/dashboard', icon: <DashboardOutlined />, label: '仪表盘' },
     { key: '/ai', icon: <RobotOutlined />, label: 'AI功能' },
+    { key: '/ollama', icon: <RobotOutlined />, label: 'Ollama管理', children: [
+      { key: '/ollama', icon: <DashboardOutlined />, label: '模型列表' },
+      { key: '/ollama/chat', icon: <MessageOutlined />, label: '聊天' },
+      { key: '/ollama/create', icon: <PlusOutlined />, label: '创建模型' },
+      { key: '/ollama/settings', icon: <SettingOutlined />, label: '配置' },
+    ]},
     { key: '/users', icon: <TeamOutlined />, label: '用户管理' },
     { key: '/vip', icon: <CrownOutlined />, label: 'VIP会员' },
     { key: '/settings', icon: <SettingOutlined />, label: '设置' },

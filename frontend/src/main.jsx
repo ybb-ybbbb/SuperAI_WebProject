@@ -13,6 +13,10 @@ import Settings from './pages/Settings.jsx'
 import Profile from './pages/Profile.jsx'
 import VIP from './pages/VIP.jsx'
 import AI from './pages/AI.jsx'
+import OllamaDashboard from './pages/OllamaDashboard.jsx'
+import OllamaChat from './pages/OllamaChat.jsx'
+import OllamaModelCreate from './pages/OllamaModelCreate.jsx'
+import OllamaSettings from './pages/OllamaSettings.jsx'
 import AuthGuard from './components/AuthGuard.jsx'
 
 createRoot(document.getElementById('root')).render(
@@ -30,13 +34,17 @@ createRoot(document.getElementById('root')).render(
             
             {/* 受保护路由 */}
             <Route element={<AuthGuard />}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/ai" element={<AI />} />
-              <Route path="/users" element={<Users />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/vip" element={<VIP />} />
-            </Route>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/ai" element={<AI />} />
+            <Route path="/users" element={<Users />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/vip" element={<VIP />} />
+            <Route path="/ollama" element={<OllamaDashboard />} />
+            <Route path="/ollama/chat" element={<OllamaChat />} />
+            <Route path="/ollama/create" element={<OllamaModelCreate />} />
+            <Route path="/ollama/settings" element={<OllamaSettings />} />
+          </Route>
             
             {/* 404页面 */}
             <Route path="*" element={<div>404页面</div>} />
