@@ -263,21 +263,18 @@ const OllamaChat = () => {
       const modelPrompt = localStorage.getItem(`ollama_prompt_template_${selectedModel}`);
       if (modelPrompt) {
         setPromptTemplate(modelPrompt);
-        form.setFieldsValue({ promptTemplate: modelPrompt });
       } else {
         // 如果模型没有特定配置，加载全局默认配置
         const globalPrompt = localStorage.getItem('ollama_prompt_template');
         if (globalPrompt) {
           setPromptTemplate(globalPrompt);
-          form.setFieldsValue({ promptTemplate: globalPrompt });
         } else {
           // 如果都没有，使用空配置
           setPromptTemplate('');
-          form.setFieldsValue({ promptTemplate: '' });
         }
       }
     }
-  }, [selectedModel, form]);
+  }, [selectedModel]);
 
   return (
     <div>
@@ -349,7 +346,7 @@ const OllamaChat = () => {
 
           <Card 
             style={{ height: 'calc(100vh - 180px)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
-            bodyStyle={{ flex: 1, display: 'flex', flexDirection: 'column', padding: 0, overflow: 'hidden' }}
+            styles={{ body: { flex: 1, display: 'flex', flexDirection: 'column', padding: 0, overflow: 'hidden' } }}
           >
             <div 
               ref={chatContainerRef}
@@ -529,6 +526,7 @@ const OllamaChat = () => {
         okText="保存"
         cancelText="取消"
         width={600}
+        destroyOnHidden
       >
         <Form
           form={form}

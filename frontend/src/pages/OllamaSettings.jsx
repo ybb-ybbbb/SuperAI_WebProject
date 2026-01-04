@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Form, Input, Button, Typography, Space, Alert, message, Select, Slider, Switch } from 'antd';
+import { Card, Form, Input, Button, Typography, Alert, message, Select, Slider, Switch } from 'antd';
 import { SaveOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useLocation } from 'react-router-dom';
 
@@ -26,7 +26,7 @@ const OllamaSettings = () => {
       temperature: parseFloat(localStorage.getItem('ollama_temperature')) || 0.7,
       maxTokens: parseInt(localStorage.getItem('ollama_max_tokens')) || 4096,
       topP: parseFloat(localStorage.getItem('ollama_top_p')) || 0.9,
-      enableStreaming: localStorage.getItem('ollama_enable_streaming') === 'true' || true,
+      enableStreaming: localStorage.getItem('ollama_enable_streaming') !== 'false', // 默认为 true
       defaultPromptTemplate: localStorage.getItem('ollama_prompt_template') || '',
       systemPrompt: localStorage.getItem('ollama_system_prompt') || ''
     };
@@ -122,11 +122,11 @@ const OllamaSettings = () => {
           form={form}
           layout="vertical"
         >
-          <Space direction="vertical" size="large" style={{ width: '100%' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             {/* 服务配置 */}
             <div>
               <Title level={4} style={{ margin: '0 0 16px 0' }}>服务配置</Title>
-              <Space direction="vertical" style={{ width: '100%' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <Form.Item
                   name="ollamaUrl"
                   label="Ollama服务地址"
@@ -142,48 +142,32 @@ const OllamaSettings = () => {
                 >
                   <Input placeholder="例如：llama3" />
                 </Form.Item>
-              </Space>
+              </div>
             </div>
 
             {/* 模型参数 */}
             <div>
               <Title level={4} style={{ margin: '0 0 16px 0' }}>模型参数</Title>
-              <Space direction="vertical" style={{ width: '100%' }}>
-                <Form.Item
-                  name="temperature"
-                  label="温度 (Temperature)"
-                  rules={[{ required: true, message: '请设置温度值' }]}
-                >
-                  <div>
-                    <Slider 
-                      min={0} 
-                      max={2} 
-                      step={0.1} 
-                      value={form.getFieldValue('temperature')} 
-                      onChange={(value) => form.setFieldsValue({ temperature: value })} 
-                    />
-                    <Text type="secondary" style={{ marginLeft: 16 }}>
-                      当前值: {form.getFieldValue('temperature')}
-                    </Text>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <Form.Item label="温度 (Temperature)" style={{ marginBottom: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                    <Form.Item name="temperature" noStyle rules={[{ required: true, message: '请设置温度值' }]}>
+                      <Slider min={0} max={2} step={0.1} style={{ flex: 1 }} />
+                    </Form.Item>
+                    <Form.Item shouldUpdate noStyle>
+                      {() => <Text type="secondary" style={{ width: 40, textAlign: 'right' }}>{form.getFieldValue('temperature')}</Text>}
+                    </Form.Item>
                   </div>
                 </Form.Item>
 
-                <Form.Item
-                  name="topP"
-                  label="Top P"
-                  rules={[{ required: true, message: '请设置Top P值' }]}
-                >
-                  <div>
-                    <Slider 
-                      min={0} 
-                      max={1} 
-                      step={0.05} 
-                      value={form.getFieldValue('topP')} 
-                      onChange={(value) => form.setFieldsValue({ topP: value })} 
-                    />
-                    <Text type="secondary" style={{ marginLeft: 16 }}>
-                      当前值: {form.getFieldValue('topP')}
-                    </Text>
+                <Form.Item label="Top P" style={{ marginBottom: 0 }}>
+                   <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                    <Form.Item name="topP" noStyle rules={[{ required: true, message: '请设置Top P值' }]}>
+                      <Slider min={0} max={1} step={0.05} style={{ flex: 1 }} />
+                    </Form.Item>
+                    <Form.Item shouldUpdate noStyle>
+                      {() => <Text type="secondary" style={{ width: 40, textAlign: 'right' }}>{form.getFieldValue('topP')}</Text>}
+                    </Form.Item>
                   </div>
                 </Form.Item>
 
@@ -192,10 +176,7 @@ const OllamaSettings = () => {
                   label="最大 tokens"
                   rules={[{ required: true, message: '请设置最大tokens值' }]}
                 >
-                  <Select
-                    value={form.getFieldValue('maxTokens')}
-                    onChange={(value) => form.setFieldsValue({ maxTokens: value })}
-                  >
+                  <Select>
                     <Select.Option value={1024}>1024</Select.Option>
                     <Select.Option value={2048}>2048</Select.Option>
                     <Select.Option value={4096}>4096</Select.Option>
@@ -209,15 +190,15 @@ const OllamaSettings = () => {
                   label="启用流式输出"
                   valuePropName="checked"
                 >
-                  <Switch checked={form.getFieldValue('enableStreaming')} />
+                  <Switch />
                 </Form.Item>
-              </Space>
+              </div>
             </div>
 
             {/* 提示词配置 */}
             <div>
               <Title level={4} style={{ margin: '0 0 16px 0' }}>提示词配置</Title>
-              <Space direction="vertical" style={{ width: '100%' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <Form.Item
                   name="systemPrompt"
                   label="默认系统提示词"
@@ -238,11 +219,11 @@ const OllamaSettings = () => {
                     rows={4}
                     placeholder={`输入默认提示词模板，例如：{{ .System }}\n\nUser: {{ .Prompt }}\nAssistant: `}
                   />
-                  <Text type="secondary" style={{ marginTop: 8, display: 'block' }}>
-                    提示：使用 &amp;lbrace;&amp;lbrace; .System &amp;rbrace;&amp;rbrace;、&amp;lbrace;&amp;lbrace; .Prompt &amp;rbrace;&amp;rbrace; 等占位符，具体可参考Ollama文档。
-                  </Text>
                 </Form.Item>
-              </Space>
+                <Text type="secondary" style={{ marginTop: -8, display: 'block' }}>
+                    提示：使用 &amp;lbrace;&amp;lbrace; .System &amp;rbrace;&amp;rbrace;、&amp;lbrace;&amp;lbrace; .Prompt &amp;rbrace;&amp;rbrace; 等占位符，具体可参考Ollama文档。
+                </Text>
+              </div>
             </div>
 
             {/* 操作按钮 */}
@@ -275,7 +256,7 @@ const OllamaSettings = () => {
                 </Button>
               </div>
             </Form.Item>
-          </Space>
+          </div>
         </Form>
       </Card>
 

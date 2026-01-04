@@ -85,7 +85,7 @@ const OllamaDashboard = () => {
               <Col xs={24} sm={12} md={8} lg={6} key={model.name}>
                 <Card
                   title={model.name}
-                  bordered={false}
+                  variant="borderless"
                   style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
                   actions={[
                     <Button 
@@ -112,7 +112,7 @@ const OllamaDashboard = () => {
                     </Button>
                   ]}
                 >
-                  <Space direction="vertical" style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
                     <Text type="secondary">ID: {model.id}</Text>
                     <Text type="secondary">大小: {model.size ? `${(model.size / (1024 * 1024 * 1024)).toFixed(2)} GB` : '未知'}</Text>
                     <Text type="secondary">创建时间: {model.created_at ? new Date(model.created_at).toLocaleString() : '未知'}</Text>
@@ -122,15 +122,13 @@ const OllamaDashboard = () => {
                     {model.details && (
                       <div>
                         <Text strong>参数:</Text>
-                        <List
-                          size="small"
-                          dataSource={Object.entries(model.details).slice(0, 5)}
-                          renderItem={([key, value]) => (
-                            <List.Item>
-                              <Text type="secondary">{key}: {value}</Text>
-                            </List.Item>
-                          )}
-                        />
+                        <div style={{ marginTop: 4 }}>
+                          {Object.entries(model.details).slice(0, 5).map(([key, value]) => (
+                            <div key={key} style={{ fontSize: '14px', color: 'rgba(0, 0, 0, 0.45)', lineHeight: 1.5715 }}>
+                              {key}: {value}
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
                     {model.tags && model.tags.length > 0 && (
@@ -142,7 +140,7 @@ const OllamaDashboard = () => {
                         </Space>
                       </div>
                     )}
-                  </Space>
+                  </div>
                 </Card>
               </Col>
             ))

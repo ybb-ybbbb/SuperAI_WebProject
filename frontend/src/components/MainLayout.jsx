@@ -56,7 +56,7 @@ const MainLayout = () => {
   const menuItems = [
     { key: '/dashboard', icon: <DashboardOutlined />, label: '仪表盘' },
     { key: '/ai', icon: <RobotOutlined />, label: 'AI功能' },
-    { key: '/ollama', icon: <RobotOutlined />, label: 'Ollama管理', children: [
+    { key: '/ollama-menu', icon: <RobotOutlined />, label: 'Ollama管理', children: [
       { key: '/ollama', icon: <DashboardOutlined />, label: '模型列表' },
       { key: '/ollama/chat', icon: <MessageOutlined />, label: '聊天' },
       { key: '/ollama/create', icon: <PlusOutlined />, label: '创建模型' },
@@ -185,7 +185,7 @@ const MainLayout = () => {
                 <Avatar 
                   style={{ backgroundColor: '#1677ff' }} 
                   icon={<UserOutlined />} 
-                  src={user.avatar} 
+                  src={user.avatar || null} 
                 />
                 <span style={{ marginLeft: 8, fontWeight: 500 }}>
                   {user.username || 'Admin'}
